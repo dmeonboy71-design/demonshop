@@ -9,7 +9,7 @@ import {
   Users, 
   Mail, 
   Search, 
-  User, 
+  Truck, 
   ShoppingCart
 } from 'lucide-react';
 import { useWizard } from '../context/WizardContext';
@@ -93,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenLookup }) => {
         </a>
       </nav>
 
-      {/* Right Actions: Search, User/Track, Cart */}
+      {/* Right Actions: Search, Track (White Truck Icon), Cart */}
       <div className="nav-actions-right">
         <button 
           type="button" 
@@ -106,26 +106,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenLookup }) => {
 
         <Link 
           href="/track" 
-          className="nav-icon-btn" 
+          className="nav-icon-btn track-nav-btn" 
           title="Track Your Order"
         >
-          <User size={15} />
+          <Truck size={17} color="#ffffff" strokeWidth={2.2} />
         </Link>
 
-        <button 
-          type="button" 
-          className="nav-icon-btn" 
-          title="Cart"
-          onClick={() => {
-            if (selectedModel) setStep(2);
-            else setStep(1);
-          }}
+        <Link 
+          href="/cart" 
+          className="nav-icon-btn cart-nav-btn" 
+          title="Shopping Cart & Selected Plan"
         >
           <ShoppingCart size={15} />
           <span className="cart-count-badge">
             {selectedModel ? 1 : 0}
           </span>
-        </button>
+        </Link>
       </div>
     </header>
   );

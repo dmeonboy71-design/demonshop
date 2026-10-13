@@ -44,10 +44,12 @@ export const Step0Landing: React.FC = () => {
               NEW ARRIVAL
             </div>
             <h1 className="hero-main-heading">
-              <svg width="20" height="20" viewBox="0 0 170 170" fill="currentColor" style={{ flexShrink: 0 }}>
-                <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.04-7.69-7.85-12.01-14.42-6.1-9.35-10.8-19.78-14.1-31.29-3.3-11.51-4.96-22.37-4.96-32.58 0-14.42 3.69-26.31 11.07-35.68 7.38-9.37 16.58-14.13 27.6-14.28 4.58 0 9.87 1.25 15.87 3.75 6 2.5 10.15 3.8 12.44 3.9 1.9.11 6.09-1.25 12.58-4.08 6.49-2.83 11.96-4.04 16.42-3.63 12.63.85 22.84 5.48 30.63 13.9-11.03 6.74-16.42 16.14-16.16 28.2.26 9.47 3.83 17.51 10.71 24.13 6.88 6.62 15.17 10.42 24.87 11.4-2.18 6.53-4.9 13.06-8.16 19.59zM119.22 31.84c0-7.72 2.76-14.9 8.27-21.54 5.51-6.64 12.33-10.3 20.47-10.3.36 1.09.54 2.22.54 3.4 0 7.72-2.85 15.02-8.54 21.9-5.69 6.88-12.63 10.54-20.82 10.98.05-1.46.08-2.94.08-4.44z"/>
-              </svg>
-              <span>iPhone 18 Pro Max</span>
+              <img 
+                src="/apple-logo-white.png" 
+                alt="Apple" 
+                className="apple-white-logo-icon" 
+              />
+              <span className="hero-title-text">iPhone 18 Pro Max</span>
             </h1>
             <p className="hero-sub-specs">
               BIGGER • SMARTER • MORE POWERFUL
@@ -385,22 +387,6 @@ export const Step0Landing: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Floating Bottom Quick-Action Pill for Mobile Devices */}
-      <div className="mobile-floating-cta-bar">
-        <div className="floating-cta-info">
-          <span className="floating-device-name">iPhone 18 Pro Max</span>
-          <span className="floating-price-plan">From PKR 10,833/mo • 0% Markup</span>
-        </div>
-        <button
-          type="button"
-          className="floating-shop-now-btn"
-          onClick={handleStartShopping}
-        >
-          <span>🛒 Shop Now</span>
-          <ChevronRight size={13} />
-        </button>
-      </div>
     </div>
   );
 };
