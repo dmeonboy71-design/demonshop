@@ -18,13 +18,22 @@ import {
   LayoutGrid,
   List,
   Check,
-  ChevronRight
+  ChevronRight,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 import {
   ThemeProvider,
   createTheme,
   CssBaseline,
+  AppBar,
+  Toolbar,
+  Tabs,
+  Tab,
+  Collapse,
+  Divider,
+  Stack,
   Drawer,
   Dialog,
   DialogTitle,
@@ -136,6 +145,27 @@ const PRESET_COLORS: ColorOption[] = [
 export default function DemonResponsiveAdminPage() {
   const { modelsList, addModel, updateModel, deleteModel, resetCatalog } = useWizard();
   const isMobile = useMediaQuery('(max-width:640px)');
+
+  // Revealing system state for mobile & desktop cards
+  const [expandedCardIds, setExpandedCardIds] = useState<Record<string, boolean>>({});
+
+  const toggleCardExpansion = (id: string) => {
+    setExpandedCardIds((prev) => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const handleToggleExpandAll = () => {
+    const areAnyExpanded = Object.values(expandedCardIds).some(Boolean);
+    if (areAnyExpanded) {
+      setExpandedCardIds({});
+    } else {
+      const all: Record<string, boolean> = {};
+      modelsList.forEach((m) => { all[m.id] = true; });
+      setExpandedCardIds(all);
+    }
+  };
 
   // Navigation Sidebar state (mobile drawer)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -488,65 +518,143 @@ export default function DemonResponsiveAdminPage() {
           }}
         >
           
-          {/* Top Header */}
-          <Box
-            component="header"
+          {/* Material UI Sticky App Bar with Mobile Tabs */}
+          <AppBar
+            position="sticky"
+            elevation={0}
             sx={{
-              position: 'sticky',
-              top: 0,
-              zIndex: 90,
-              backgroundColor: 'rgba(15, 23, 42, 0.92)',
+              backgroundColor: 'rgba(15, 23, 42, 0.95)',
               backdropFilter: 'blur(12px)',
               borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-              px: { xs: 2, sm: 3 },
-              py: 1.5,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              zIndex: 90,
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <IconButton
-                onClick={() => setIsSidebarOpen(true)}
-                sx={{ display: { lg: 'none' }, color: '#ffffff', p: 0.8 }}
-                aria-label="Open Navigation Drawer"
-              >
-                <Menu size={22} />
-              </IconButton>
-              <Typography variant="h6" sx={{ fontWeight: 800, color: '#ffffff', fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
-                Admin Dashboard
-              </Typography>
-            </Box>
+            <Toolbar
+              variant="dense"
+              sx={{
+                minHeight: { xs: 46, sm: 54 },
+                px: { xs: 1.5, sm: 2.5 },
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <IconButton
+                  onClick={() => setIsSidebarOpen(true)}
+                  sx={{ display: { lg: 'none' }, color: '#ffffff', p: 0.5 }}
+                  aria-label="Open Navigation Drawer"
+                  size="small"
+                >
+                  <Menu size={20} />
+                </IconButton>
+                <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#ffffff', fontSize: { xs: '0.95rem', sm: '1.15rem' } }}>
+                  Admin Panel
+                </Typography>
+                <Chip
+                  label="IML"
+                  size="small"
+                  sx={{
+                    height: 18,
+                    fontSize: '0.62rem',
+                    fontWeight: 800,
+                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                    color: '#818cf8',
+                  }}
+                />
+              </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="small"
-                onClick={handleOpenAddModal}
-                startIcon={<Plus size={16} />}
-                sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
-              >
-                Add Device
-              </Button>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                {/* Shorter Add Button */}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  onClick={handleOpenAddModal}
+                  startIcon={<Plus size={14} />}
+                  sx={{
+                    px: { xs: 1, sm: 1.5 },
+                    py: 0.35,
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    borderRadius: 2,
+                  }}
+                >
+                  + Add
+                </Button>
 
-              <Button
-                variant="outlined"
-                color="inherit"
-                size="small"
-                onClick={handleReset}
-                startIcon={<RotateCcw size={16} />}
-                sx={{ borderColor: 'rgba(255,255,255,0.2)', color: '#cbd5e1' }}
+                {/* Shorter Reset Button */}
+                <Tooltip title="Reset catalog to factory defaults">
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    size="small"
+                    onClick={handleReset}
+                    startIcon={<RotateCcw size={13} />}
+                    sx={{
+                      borderColor: 'rgba(255,255,255,0.18)',
+                      color: '#cbd5e1',
+                      px: { xs: 0.8, sm: 1.2 },
+                      py: 0.35,
+                      fontSize: '0.72rem',
+                      minWidth: 'auto',
+                      borderRadius: 2,
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </Tooltip>
+              </Box>
+            </Toolbar>
+
+            {/* Mobile Material UI Tabs Bar (<1024px) for 1-touch tab navigation */}
+            <Box sx={{ display: { xs: 'block', lg: 'none' }, borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+              <Tabs
+                value={activeTab}
+                onChange={(_, val) => setActiveTab(val)}
+                variant="scrollable"
+                scrollButtons={false}
+                sx={{
+                  minHeight: 38,
+                  '& .MuiTabs-indicator': { backgroundColor: '#818cf8', height: 2.5 },
+                }}
               >
-                Reset
-              </Button>
+                <Tab
+                  label={`Devices (${modelsList.length})`}
+                  value="catalog"
+                  icon={<Smartphone size={14} />}
+                  iconPosition="start"
+                  sx={{ minHeight: 38, py: 0.5, px: 1.5, fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#818cf8' } }}
+                />
+                <Tab
+                  label="Colors"
+                  value="colors"
+                  icon={<Palette size={14} />}
+                  iconPosition="start"
+                  sx={{ minHeight: 38, py: 0.5, px: 1.5, fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#818cf8' } }}
+                />
+                <Tab
+                  label="Variants"
+                  value="variants"
+                  icon={<Layers size={14} />}
+                  iconPosition="start"
+                  sx={{ minHeight: 38, py: 0.5, px: 1.5, fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#818cf8' } }}
+                />
+                <Tab
+                  label="Brands"
+                  value="brands"
+                  icon={<Sliders size={14} />}
+                  iconPosition="start"
+                  sx={{ minHeight: 38, py: 0.5, px: 1.5, fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#818cf8' } }}
+                />
+              </Tabs>
             </Box>
-          </Box>
+          </AppBar>
 
           {/* Inner Workspace Container */}
           <Box
             sx={{
-              p: { xs: 1.5, sm: 2.5, md: 3 },
+              p: { xs: 1, sm: 2, md: 2.5 },
               maxWidth: 1350,
               width: '100%',
               mx: 'auto',
@@ -554,46 +662,95 @@ export default function DemonResponsiveAdminPage() {
             }}
           >
             
-            {/* Overview Hero Card */}
+            {/* High-Density Compact Filter & Hero Section */}
             <Card
               sx={{
-                background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)',
-                border: '1px solid rgba(99, 102, 241, 0.25)',
-                borderRadius: 4,
-                p: { xs: 2, sm: 2.5 },
-                mb: 3,
+                background: 'linear-gradient(135deg, #131b2e 0%, #0f172a 100%)',
+                border: '1px solid rgba(99, 102, 241, 0.2)',
+                borderRadius: { xs: 2.5, sm: 3.5 },
+                p: { xs: 1.25, sm: 2 },
+                mb: { xs: 1.5, sm: 2.5 },
               }}
             >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 1.5 }}>
-                <Box>
-                  <Typography variant="h5" sx={{ fontWeight: 900, color: '#ffffff', fontSize: { xs: '1.25rem', sm: '1.5rem' }, mb: 0.5 }}>
-                    {activeTab === 'catalog' && 'Mobile Device Catalog'}
-                    {activeTab === 'colors' && 'Color Variations Manager'}
-                    {activeTab === 'variants' && 'Storage & RAM Variant Manager'}
-                    {activeTab === 'brands' && 'Brand & Series Structure'}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#a5b4fc', fontSize: { xs: '0.78rem', sm: '0.875rem' } }}>
-                    Manage devices, color swatches, RAM/storage variants & PKR prices in real time.
+              {/* Compact Header Info & Reveal All Button */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: { xs: '0.85rem', sm: '1.1rem' } }}>
+                    {activeTab === 'catalog' && `Device Catalog (${filteredModels.length})`}
+                    {activeTab === 'colors' && 'Color Swatches'}
+                    {activeTab === 'variants' && 'Storage & RAM Configurations'}
+                    {activeTab === 'brands' && 'Brands & Series'}
                   </Typography>
                 </Box>
 
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={handleOpenAddModal}
-                  startIcon={<Plus size={16} />}
-                  sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
-                >
-                  Add Device
-                </Button>
+                {activeTab === 'catalog' && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    {/* Shorter Reveal All Button */}
+                    <Button
+                      size="small"
+                      variant="text"
+                      onClick={handleToggleExpandAll}
+                      sx={{
+                        fontSize: '0.7rem',
+                        py: 0.2,
+                        px: 0.8,
+                        minWidth: 'auto',
+                        color: '#818cf8',
+                        fontWeight: 700,
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderRadius: 1.5,
+                      }}
+                    >
+                      {Object.values(expandedCardIds).some(Boolean) ? 'Hide All' : 'Reveal All'}
+                    </Button>
+
+                    {/* Grid / Table View Toggle */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        backgroundColor: 'rgba(0, 0, 0, 0.35)',
+                        border: '1px solid rgba(255, 255, 255, 0.12)',
+                        borderRadius: 2,
+                        p: 0.2,
+                      }}
+                    >
+                      <IconButton
+                        size="small"
+                        onClick={() => setViewMode('grid')}
+                        sx={{
+                          p: 0.4,
+                          borderRadius: 1.5,
+                          backgroundColor: viewMode === 'grid' ? '#6366f1' : 'transparent',
+                          color: viewMode === 'grid' ? '#ffffff' : '#94a3b8',
+                        }}
+                        title="Grid View"
+                      >
+                        <LayoutGrid size={14} />
+                      </IconButton>
+
+                      <IconButton
+                        size="small"
+                        onClick={() => setViewMode('table')}
+                        sx={{
+                          p: 0.4,
+                          borderRadius: 1.5,
+                          backgroundColor: viewMode === 'table' ? '#6366f1' : 'transparent',
+                          color: viewMode === 'table' ? '#ffffff' : '#94a3b8',
+                        }}
+                        title="Table View"
+                      >
+                        <List size={14} />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                )}
               </Box>
 
-              {/* Filters & Search Row */}
-              <Box sx={{ mt: 2.5, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5 }}>
+              {/* High-Density Filters Row */}
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1 }}>
                 
                 {/* Search Field */}
-                <Box sx={{ flex: 1, minWidth: 200 }}>
+                <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: 180 } }}>
                   <TextField
                     fullWidth
                     size="small"
@@ -601,25 +758,26 @@ export default function DemonResponsiveAdminPage() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     InputProps={{
-                      startAdornment: <Search size={18} color="#94a3b8" style={{ marginRight: 8 }} />,
+                      startAdornment: <Search size={15} color="#94a3b8" style={{ marginRight: 6 }} />,
                       endAdornment: searchTerm ? (
-                        <IconButton size="small" onClick={() => setSearchTerm('')} sx={{ color: '#94a3b8' }}>
-                          <X size={16} />
+                        <IconButton size="small" onClick={() => setSearchTerm('')} sx={{ color: '#94a3b8', p: 0.3 }}>
+                          <X size={14} />
                         </IconButton>
                       ) : null,
                       sx: {
                         backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                        borderRadius: 2.5,
-                        fontSize: '0.875rem',
-                        '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.15)' },
+                        borderRadius: 2,
+                        fontSize: '0.8rem',
+                        height: 34,
+                        '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.12)' },
                       },
                     }}
                   />
                 </Box>
 
                 {/* Brand & Series Select Filters */}
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: { xs: 'nowrap', sm: 'wrap' }, width: { xs: '100%', sm: 'auto' } }}>
-                  <FormControl size="small" sx={{ flex: 1, minWidth: 0 }}>
+                <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
+                  <FormControl size="small" sx={{ flex: 1, minWidth: { xs: 0, sm: 130 } }}>
                     <Select
                       value={selectedBrandFilter}
                       onChange={(e) => {
@@ -628,10 +786,11 @@ export default function DemonResponsiveAdminPage() {
                       }}
                       sx={{
                         backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                        borderRadius: 2.5,
-                        fontSize: '0.8rem',
+                        borderRadius: 2,
+                        fontSize: '0.78rem',
+                        height: 34,
                         color: '#ffffff',
-                        '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.15)' },
+                        '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.12)' },
                       }}
                     >
                       <MenuItem value="all">All Brands</MenuItem>
@@ -641,16 +800,17 @@ export default function DemonResponsiveAdminPage() {
                     </Select>
                   </FormControl>
 
-                  <FormControl size="small" sx={{ flex: 1, minWidth: 0 }}>
+                  <FormControl size="small" sx={{ flex: 1, minWidth: { xs: 0, sm: 120 } }}>
                     <Select
                       value={selectedSeriesFilter}
                       onChange={(e) => setSelectedSeriesFilter(e.target.value)}
                       sx={{
                         backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                        borderRadius: 2.5,
-                        fontSize: '0.8rem',
+                        borderRadius: 2,
+                        fontSize: '0.78rem',
+                        height: 34,
                         color: '#ffffff',
-                        '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.15)' },
+                        '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.12)' },
                       }}
                     >
                       <MenuItem value="all">All Series</MenuItem>
@@ -659,61 +819,19 @@ export default function DemonResponsiveAdminPage() {
                       ))}
                     </Select>
                   </FormControl>
-
-                  {/* Grid / Table View Toggle Buttons */}
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      borderRadius: 2.5,
-                      p: 0.3,
-                      flexShrink: 0,
-                    }}
-                  >
-                    <IconButton
-                      size="small"
-                      onClick={() => setViewMode('grid')}
-                      sx={{
-                        borderRadius: 2,
-                        p: 0.6,
-                        backgroundColor: viewMode === 'grid' ? '#6366f1' : 'transparent',
-                        color: viewMode === 'grid' ? '#ffffff' : '#94a3b8',
-                        '&:hover': { backgroundColor: viewMode === 'grid' ? '#6366f1' : 'rgba(255,255,255,0.08)' },
-                      }}
-                      title="Grid View"
-                    >
-                      <LayoutGrid size={16} />
-                    </IconButton>
-
-                    <IconButton
-                      size="small"
-                      onClick={() => setViewMode('table')}
-                      sx={{
-                        borderRadius: 2,
-                        p: 0.6,
-                        backgroundColor: viewMode === 'table' ? '#6366f1' : 'transparent',
-                        color: viewMode === 'table' ? '#ffffff' : '#94a3b8',
-                        '&:hover': { backgroundColor: viewMode === 'table' ? '#6366f1' : 'rgba(255,255,255,0.08)' },
-                      }}
-                      title="Table View"
-                    >
-                      <List size={16} />
-                    </IconButton>
-                  </Box>
                 </Box>
               </Box>
 
-              {/* Horizontal Scrollable Brand Pills */}
+              {/* Horizontal Scrollable Brand Pills (Ultra Compact) */}
               <Box
                 sx={{
                   display: 'flex',
-                  gap: 1,
+                  gap: 0.8,
                   overflowX: 'auto',
-                  mt: 2,
-                  pb: 0.5,
-                  '&::-webkit-scrollbar': { height: 4 },
-                  '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 4 },
+                  mt: 1.2,
+                  pb: 0.2,
+                  '&::-webkit-scrollbar': { height: 3 },
+                  '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 3 },
                 }}
               >
                 <Chip
@@ -723,7 +841,7 @@ export default function DemonResponsiveAdminPage() {
                   variant={selectedBrandFilter === 'all' ? 'filled' : 'outlined'}
                   size="small"
                   clickable
-                  sx={{ borderRadius: 4, fontWeight: 700, fontSize: '0.75rem' }}
+                  sx={{ height: 22, borderRadius: 3, fontWeight: 700, fontSize: '0.68rem', px: 0.5 }}
                 />
                 {BRANDS.map((b) => {
                   const count = modelsList.filter((m) => m.brandId === b.id).length;
@@ -737,7 +855,7 @@ export default function DemonResponsiveAdminPage() {
                       variant={isSelected ? 'filled' : 'outlined'}
                       size="small"
                       clickable
-                      sx={{ borderRadius: 4, fontWeight: 600, fontSize: '0.75rem', borderColor: isSelected ? undefined : 'rgba(255,255,255,0.15)' }}
+                      sx={{ height: 22, borderRadius: 3, fontWeight: 600, fontSize: '0.68rem', px: 0.5, borderColor: isSelected ? undefined : 'rgba(255,255,255,0.12)' }}
                     />
                   );
                 })}
@@ -876,13 +994,7 @@ export default function DemonResponsiveAdminPage() {
                       </TableContainer>
                     )}
 
-                    {/* GRID VIEW: Strict Mobile-First Layout */}
-                    {/*
-                      Mobile (<640px): 1 COLUMN PER ROW
-                      Tablet (640px-1023px): 2 COLUMNS PER ROW
-                      Desktop (1024px-1279px): 3 COLUMNS PER ROW
-                      Large Desktop (1280px+): 4 COLUMNS PER ROW
-                    */}
+                    {/* GRID VIEW: Responsive Revealing System & Shorter Buttons */}
                     {viewMode === 'grid' && (
                       <Box
                         sx={{
@@ -890,10 +1002,9 @@ export default function DemonResponsiveAdminPage() {
                           gridTemplateColumns: {
                             xs: '1fr',
                             sm: 'repeat(2, 1fr)',
-                            md: 'repeat(3, 1fr)',
-                            xl: 'repeat(4, 1fr)',
+                            lg: 'repeat(3, 1fr)',
                           },
-                          gap: 2,
+                          gap: 1.5,
                           width: '100%',
                         }}
                       >
@@ -901,181 +1012,212 @@ export default function DemonResponsiveAdminPage() {
                           const brand = BRANDS.find((b) => b.id === model.brandId);
                           const series = SERIES.find((s) => s.id === model.seriesId);
                           const monthly = Math.round(model.basePrice / 24);
+                          const isExpanded = !!expandedCardIds[model.id];
+
+                          const downP = model.downPayment ?? Math.round(model.basePrice * 0.3);
+                          const emi12 = model.installments?.[12] ?? Math.round((model.basePrice - downP) / 12);
+                          const emi24 = model.installments?.[24] ?? Math.round((model.basePrice - downP) / 24);
+                          const emi36 = model.installments?.[36] ?? Math.round((model.basePrice - downP) / 36);
 
                           return (
                             <Card
                               key={model.id}
                               sx={{
                                 backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                border: '1px solid rgba(255, 255, 255, 0.08)',
-                                borderRadius: 3.5,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                transition: 'transform 0.2s ease, border-color 0.2s ease',
-                                '&:hover': {
-                                  borderColor: 'rgba(99, 102, 241, 0.4)',
-                                  transform: 'translateY(-2px)',
-                                },
+                                border: isExpanded ? '1px solid rgba(99, 102, 241, 0.45)' : '1px solid rgba(255, 255, 255, 0.08)',
+                                borderRadius: { xs: 2.5, sm: 3 },
+                                transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                                overflow: 'hidden',
                               }}
                             >
-                              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 }, display: 'flex', flexDirection: 'column', gap: 1.5, flex: 1 }}>
+                              {/* Compact Primary Row (High Density) */}
+                              <Box sx={{ p: { xs: 1.2, sm: 1.5 }, display: 'flex', alignItems: 'center', gap: 1.2 }}>
                                 
-                                {/* Top Header Info */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                  <Box
-                                    sx={{
-                                      width: 48,
-                                      height: 48,
-                                      backgroundColor: '#ffffff',
-                                      borderRadius: 2.5,
-                                      p: 0.5,
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      flexShrink: 0,
-                                    }}
-                                  >
-                                    <Box component="img" src={model.image} alt={model.name} sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                                  </Box>
+                                {/* Device Thumbnail */}
+                                <Box
+                                  sx={{
+                                    width: { xs: 38, sm: 44 },
+                                    height: { xs: 38, sm: 44 },
+                                    backgroundColor: '#ffffff',
+                                    borderRadius: 2,
+                                    p: 0.4,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  <Box component="img" src={model.image} alt={model.name} sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                                </Box>
 
-                                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                                    <Typography variant="caption" sx={{ color: '#818cf8', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem', display: 'block' }}>
+                                {/* Model Info */}
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                                    <Typography variant="caption" sx={{ color: '#818cf8', fontWeight: 700, fontSize: '0.65rem', textTransform: 'uppercase' }}>
                                       {brand?.name} • {series?.name}
                                     </Typography>
-                                    <Typography
-                                      variant="subtitle1"
-                                      sx={{
-                                        fontWeight: 800,
-                                        color: '#ffffff',
-                                        fontSize: '0.95rem',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        lineHeight: 1.2,
-                                        my: 0.3,
-                                      }}
-                                    >
-                                      {model.name}
-                                    </Typography>
-                                    <Typography
-                                      variant="caption"
-                                      sx={{
-                                        color: '#94a3b8',
-                                        fontSize: '0.725rem',
-                                        display: 'block',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                      }}
-                                    >
-                                      {model.specs.join(' • ')}
-                                    </Typography>
+                                    <Chip label="PTA" size="small" sx={{ height: 16, fontSize: '0.58rem', fontWeight: 700, backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }} />
                                   </Box>
-                                </Box>
-
-                                {/* Swatches Strip */}
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                                    px: 1.5,
-                                    py: 0.8,
-                                    borderRadius: 2,
-                                  }}
-                                >
-                                  <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.7rem' }}>
-                                    Swatches:
+                                  <Typography
+                                    variant="subtitle2"
+                                    sx={{
+                                      fontWeight: 800,
+                                      color: '#ffffff',
+                                      fontSize: { xs: '0.85rem', sm: '0.92rem' },
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      lineHeight: 1.2,
+                                      my: 0.2,
+                                    }}
+                                  >
+                                    {model.name}
                                   </Typography>
-                                  <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
-                                    {model.colors && model.colors.length > 0 ? (
-                                      model.colors.map((c, i) => (
-                                        <Tooltip key={i} title={c.name} arrow>
-                                          <Box
-                                            sx={{
-                                              width: 14,
-                                              height: 14,
-                                              borderRadius: '50%',
-                                              backgroundColor: c.hex,
-                                              border: '1px solid rgba(255, 255, 255, 0.4)',
-                                            }}
-                                          />
-                                        </Tooltip>
-                                      ))
-                                    ) : (
-                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>Standard</Typography>
-                                    )}
-                                  </Box>
-                                </Box>
-
-                                {/* Price Box */}
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                                    px: 1.5,
-                                    py: 1,
-                                    borderRadius: 2.5,
-                                  }}
-                                >
-                                  <Box>
-                                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.65rem', display: 'block' }}>
-                                      Cash Price
-                                    </Typography>
-                                    <Typography variant="subtitle2" sx={{ color: '#f43f5e', fontWeight: 900, fontSize: '0.95rem' }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap' }}>
+                                    <Typography variant="caption" sx={{ color: '#f43f5e', fontWeight: 900, fontSize: '0.78rem' }}>
                                       Rs. {model.basePrice.toLocaleString('en-PK')}
                                     </Typography>
-                                  </Box>
-
-                                  <Box sx={{ textAlign: 'right' }}>
-                                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.65rem', display: 'block' }}>
-                                      24-Mo EMI
-                                    </Typography>
-                                    <Typography variant="subtitle2" sx={{ color: '#38bdf8', fontWeight: 700, fontSize: '0.85rem' }}>
+                                    <Typography variant="caption" sx={{ color: '#38bdf8', fontWeight: 700, fontSize: '0.72rem' }}>
                                       Rs. {monthly.toLocaleString('en-PK')}/mo
                                     </Typography>
                                   </Box>
                                 </Box>
 
-                                {/* Action Buttons */}
-                                <Box sx={{ display: 'flex', gap: 1, mt: 'auto' }}>
+                                {/* Shorter Action Buttons */}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
                                   <Button
-                                    fullWidth
                                     size="small"
                                     onClick={() => handleOpenEditModal(model)}
-                                    startIcon={<Edit3 size={14} />}
                                     sx={{
-                                      backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                                      minWidth: 'auto',
+                                      px: { xs: 0.8, sm: 1.2 },
+                                      py: 0.3,
+                                      fontSize: '0.7rem',
                                       color: '#818cf8',
-                                      fontSize: '0.75rem',
-                                      py: 0.8,
-                                      '&:hover': { backgroundColor: 'rgba(99, 102, 241, 0.25)' },
+                                      fontWeight: 700,
+                                      backgroundColor: 'rgba(99, 102, 241, 0.12)',
+                                      borderRadius: 1.5,
+                                      '&:hover': { backgroundColor: 'rgba(99, 102, 241, 0.22)' }
                                     }}
                                   >
                                     Edit
                                   </Button>
 
                                   <Button
-                                    fullWidth
                                     size="small"
                                     onClick={() => handleDelete(model.id, model.name)}
-                                    startIcon={<Trash2 size={14} />}
                                     sx={{
-                                      backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                                      minWidth: 'auto',
+                                      px: { xs: 0.8, sm: 1.2 },
+                                      py: 0.3,
+                                      fontSize: '0.7rem',
                                       color: '#f87171',
-                                      fontSize: '0.75rem',
-                                      py: 0.8,
-                                      '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.25)' },
+                                      fontWeight: 700,
+                                      backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                                      borderRadius: 1.5,
+                                      '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.22)' }
                                     }}
                                   >
-                                    Delete
+                                    Del
+                                  </Button>
+
+                                  {/* Revealing Toggle Button */}
+                                  <Button
+                                    size="small"
+                                    variant="outlined"
+                                    onClick={() => toggleCardExpansion(model.id)}
+                                    endIcon={isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                                    sx={{
+                                      minWidth: 'auto',
+                                      px: { xs: 0.9, sm: 1.2 },
+                                      py: 0.3,
+                                      fontSize: '0.7rem',
+                                      borderRadius: 1.5,
+                                      borderColor: isExpanded ? '#818cf8' : 'rgba(255, 255, 255, 0.15)',
+                                      color: isExpanded ? '#818cf8' : '#cbd5e1',
+                                      backgroundColor: isExpanded ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                                    }}
+                                  >
+                                    {isExpanded ? 'Hide' : 'Specs'}
                                   </Button>
                                 </Box>
+                              </Box>
 
-                              </CardContent>
+                              {/* REVEALING SYSTEM: Collapsible Detailed Breakdown */}
+                              <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+                                <Box sx={{ p: { xs: 1.2, sm: 1.6 }, backgroundColor: 'rgba(0, 0, 0, 0.25)', display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                  
+                                  {/* Specs tags */}
+                                  <Box>
+                                    <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.65rem', textTransform: 'uppercase', display: 'block', mb: 0.4 }}>
+                                      Specs & Warranty:
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.4 }}>
+                                      {model.specs.map((sp, i) => (
+                                        <Chip key={i} label={sp} size="small" sx={{ height: 18, fontSize: '0.65rem', backgroundColor: 'rgba(255,255,255,0.06)', color: '#cbd5e1' }} />
+                                      ))}
+                                    </Box>
+                                  </Box>
+
+                                  {/* Color Swatches */}
+                                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 0.8 }}>
+                                    <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.65rem', textTransform: 'uppercase' }}>
+                                      Color Options:
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
+                                      {model.colors && model.colors.map((c, i) => (
+                                        <Tooltip key={i} title={c.name} arrow>
+                                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
+                                            <Box sx={{ width: 13, height: 13, borderRadius: '50%', backgroundColor: c.hex, border: '1px solid rgba(255,255,255,0.4)' }} />
+                                            <Typography variant="caption" sx={{ color: '#cbd5e1', fontSize: '0.65rem' }}>{c.name}</Typography>
+                                          </Box>
+                                        </Tooltip>
+                                      ))}
+                                    </Box>
+                                  </Box>
+
+                                  {/* Storage Variants */}
+                                  {model.storageOptions && model.storageOptions.length > 0 && (
+                                    <Box>
+                                      <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.65rem', textTransform: 'uppercase', display: 'block', mb: 0.4 }}>
+                                        Storage Configurations:
+                                      </Typography>
+                                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                        {model.storageOptions.map((st, i) => (
+                                          <Chip
+                                            key={i}
+                                            label={`${st.size} ${st.priceDelta > 0 ? `(+Rs. ${st.priceDelta.toLocaleString('en-PK')})` : '(Base)'}`}
+                                            size="small"
+                                            sx={{ height: 20, fontSize: '0.65rem', fontWeight: 600, backgroundColor: 'rgba(99, 102, 241, 0.15)', color: '#818cf8' }}
+                                          />
+                                        ))}
+                                      </Box>
+                                    </Box>
+                                  )}
+
+                                  {/* Installment Plan Breakdown Grid */}
+                                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0.6, backgroundColor: 'rgba(0, 0, 0, 0.35)', p: 0.8, borderRadius: 2 }}>
+                                    <Box sx={{ textAlign: 'center' }}>
+                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.6rem', display: 'block', fontWeight: 700 }}>DOWN</Typography>
+                                      <Typography variant="caption" sx={{ color: '#f1f5f9', fontSize: '0.7rem', fontWeight: 800 }}>Rs. {downP.toLocaleString('en-PK')}</Typography>
+                                    </Box>
+                                    <Box sx={{ textAlign: 'center' }}>
+                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.6rem', display: 'block', fontWeight: 700 }}>12-MO</Typography>
+                                      <Typography variant="caption" sx={{ color: '#38bdf8', fontSize: '0.7rem', fontWeight: 800 }}>Rs. {emi12.toLocaleString('en-PK')}</Typography>
+                                    </Box>
+                                    <Box sx={{ textAlign: 'center' }}>
+                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.6rem', display: 'block', fontWeight: 700 }}>24-MO</Typography>
+                                      <Typography variant="caption" sx={{ color: '#38bdf8', fontSize: '0.7rem', fontWeight: 800 }}>Rs. {emi24.toLocaleString('en-PK')}</Typography>
+                                    </Box>
+                                    <Box sx={{ textAlign: 'center' }}>
+                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.6rem', display: 'block', fontWeight: 700 }}>36-MO</Typography>
+                                      <Typography variant="caption" sx={{ color: '#38bdf8', fontSize: '0.7rem', fontWeight: 800 }}>Rs. {emi36.toLocaleString('en-PK')}</Typography>
+                                    </Box>
+                                  </Box>
+
+                                </Box>
+                              </Collapse>
                             </Card>
                           );
                         })}
@@ -1098,31 +1240,31 @@ export default function DemonResponsiveAdminPage() {
 
             {/* TAB 2: COLOR SWATCHES MANAGER */}
             {activeTab === 'colors' && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: '#ffffff', mb: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#ffffff' }}>
                   Global Color Variations Catalog
                 </Typography>
 
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 1.5 }}>
                   {PRESET_COLORS.map((preset, idx) => {
                     const matchedModels = modelsList.filter((m) => m.colors?.some((c) => c.hex.toLowerCase() === preset.hex.toLowerCase()));
                     return (
-                      <Card key={idx} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', p: 2 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                          <Box sx={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: preset.hex, border: '2px solid rgba(255,255,255,0.4)' }} />
-                          <Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff' }}>{preset.name}</Typography>
-                            <Typography variant="caption" sx={{ color: '#94a3b8' }}>{preset.hex}</Typography>
+                      <Card key={idx} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: 2.5, p: { xs: 1.25, sm: 1.75 } }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1 }}>
+                          <Box sx={{ width: 22, height: 22, borderRadius: '50%', backgroundColor: preset.hex, border: '2px solid rgba(255,255,255,0.4)', flexShrink: 0 }} />
+                          <Box sx={{ minWidth: 0, flex: 1 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.82rem', lineHeight: 1.2 }}>{preset.name}</Typography>
+                            <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.68rem' }}>{preset.hex}</Typography>
                           </Box>
-                          <Chip label={`${matchedModels.length} models`} size="small" color="secondary" sx={{ ml: 'auto', fontSize: '0.7rem' }} />
+                          <Chip label={`${matchedModels.length}`} size="small" color="secondary" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 800 }} />
                         </Box>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.4, mt: 0.8 }}>
                           {matchedModels.length > 0 ? (
                             matchedModels.map((m) => (
-                              <Chip key={m.id} label={m.name} size="small" variant="outlined" sx={{ fontSize: '0.68rem', color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.15)' }} />
+                              <Chip key={m.id} label={m.name} size="small" variant="outlined" sx={{ height: 18, fontSize: '0.62rem', color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.12)' }} />
                             ))
                           ) : (
-                            <Typography variant="caption" sx={{ color: '#64748b' }}>No models assigned yet</Typography>
+                            <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.68rem' }}>No models assigned yet</Typography>
                           )}
                         </Box>
                       </Card>
@@ -1134,33 +1276,33 @@ export default function DemonResponsiveAdminPage() {
 
             {/* TAB 3: STORAGE VARIANTS MANAGER */}
             {activeTab === 'variants' && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: '#ffffff', mb: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#ffffff' }}>
                   Storage & RAM Configurations Matrix
                 </Typography>
 
                 {isMobile ? (
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
                     {modelsList.map((m) => (
-                      <Card key={m.id} sx={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 3, p: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.2 }}>
-                          <Box>
-                            <Typography variant="subtitle2" sx={{ color: '#ffffff', fontWeight: 800 }}>{m.name}</Typography>
-                            <Typography variant="caption" sx={{ color: '#f43f5e', fontWeight: 700, fontSize: '0.8rem' }}>
+                      <Card key={m.id} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: 2.5, p: 1.25 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
+                          <Box sx={{ minWidth: 0, flex: 1 }}>
+                            <Typography variant="subtitle2" sx={{ color: '#ffffff', fontWeight: 800, fontSize: '0.85rem' }}>{m.name}</Typography>
+                            <Typography variant="caption" sx={{ color: '#f43f5e', fontWeight: 800, fontSize: '0.75rem' }}>
                               Base: Rs. {m.basePrice.toLocaleString('en-PK')}
                             </Typography>
                           </Box>
-                          <Button size="small" onClick={() => handleOpenEditModal(m)} sx={{ color: '#818cf8', py: 0.4, px: 1.2, backgroundColor: 'rgba(99, 102, 241, 0.12)' }}>
+                          <Button size="small" onClick={() => handleOpenEditModal(m)} sx={{ color: '#818cf8', py: 0.25, px: 1, minWidth: 'auto', fontSize: '0.7rem', fontWeight: 700, backgroundColor: 'rgba(99, 102, 241, 0.12)', borderRadius: 1.5 }}>
                             Edit
                           </Button>
                         </Box>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, mt: 1 }}>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.6 }}>
                           {m.storageOptions?.map((st, i) => (
                             <Chip
                               key={i}
                               label={`${st.size} ${st.priceDelta > 0 ? `(+Rs. ${st.priceDelta.toLocaleString('en-PK')})` : '(Base)'}`}
                               size="small"
-                              sx={{ backgroundColor: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', fontSize: '0.725rem', fontWeight: 600 }}
+                              sx={{ height: 20, backgroundColor: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', fontSize: '0.68rem', fontWeight: 600 }}
                             />
                           ))}
                         </Box>
@@ -1196,7 +1338,7 @@ export default function DemonResponsiveAdminPage() {
                               </Box>
                             </TableCell>
                             <TableCell align="right">
-                              <Button size="small" onClick={() => handleOpenEditModal(m)} sx={{ color: '#818cf8' }}>Manage</Button>
+                              <Button size="small" onClick={() => handleOpenEditModal(m)} sx={{ color: '#818cf8', minWidth: 'auto', px: 1, py: 0.2, fontSize: '0.72rem' }}>Edit</Button>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -1209,41 +1351,39 @@ export default function DemonResponsiveAdminPage() {
 
             {/* TAB 4: BRANDS & SERIES STRUCTURE */}
             {activeTab === 'brands' && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: '#ffffff', mb: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#ffffff' }}>
                   Official Brand & Series Directory
                 </Typography>
 
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 1.5 }}>
                   {BRANDS.map((b) => {
                     const brandModels = modelsList.filter((m) => m.brandId === b.id);
                     const brandSeries = SERIES.filter((s) => s.brandId === b.id);
 
                     return (
-                      <Card key={b.id} sx={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', p: 2 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-                          <Box component="img" src={b.logoUrl} alt={b.name} sx={{ width: 36, height: 36, objectFit: 'contain', backgroundColor: '#ffffff', borderRadius: 2, p: 0.5 }} />
-                          <Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#ffffff' }}>{b.name}</Typography>
-                            <Typography variant="caption" sx={{ color: '#94a3b8' }}>{brandModels.length} Total Devices</Typography>
+                      <Card key={b.id} sx={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2.5, p: { xs: 1.25, sm: 1.75 } }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1 }}>
+                          <Box component="img" src={b.logoUrl} alt={b.name} sx={{ width: 32, height: 32, objectFit: 'contain', backgroundColor: '#ffffff', borderRadius: 1.5, p: 0.4 }} />
+                          <Box sx={{ minWidth: 0, flex: 1 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.85rem' }}>{b.name}</Typography>
+                            <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.68rem' }}>{brandModels.length} Devices</Typography>
                           </Box>
+                          <Button
+                            size="small"
+                            onClick={() => { setSelectedBrandFilter(b.id); setActiveTab('catalog'); }}
+                            sx={{ minWidth: 'auto', px: 1, py: 0.3, fontSize: '0.7rem', fontWeight: 700, backgroundColor: 'rgba(99, 102, 241, 0.12)', color: '#818cf8', borderRadius: 1.5 }}
+                          >
+                            View
+                          </Button>
                         </Box>
 
-                        <Typography variant="caption" sx={{ color: '#818cf8', fontWeight: 700, mt: 1, display: 'block' }}>Series list:</Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                        <Typography variant="caption" sx={{ color: '#818cf8', fontWeight: 700, fontSize: '0.65rem', display: 'block', mb: 0.4 }}>Series:</Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.4 }}>
                           {brandSeries.map((s) => (
-                            <Chip key={s.id} label={s.name} size="small" variant="outlined" sx={{ fontSize: '0.7rem', color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.15)' }} />
+                            <Chip key={s.id} label={s.name} size="small" variant="outlined" sx={{ height: 18, fontSize: '0.65rem', color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.12)' }} />
                           ))}
                         </Box>
-
-                        <Button
-                          fullWidth
-                          size="small"
-                          onClick={() => { setSelectedBrandFilter(b.id); setActiveTab('catalog'); }}
-                          sx={{ mt: 2, backgroundColor: 'rgba(99, 102, 241, 0.15)', color: '#818cf8' }}
-                        >
-                          View {b.name} Devices
-                        </Button>
                       </Card>
                     );
                   })}
@@ -1254,21 +1394,22 @@ export default function DemonResponsiveAdminPage() {
           </Box>
         </Box>
 
-        {/* Mobile Floating Action Button (FAB) */}
+        {/* Mobile Floating Action Button (FAB) - Compact */}
         <Fab
           color="primary"
           aria-label="Add Device"
           onClick={handleOpenAddModal}
+          size={isMobile ? 'small' : 'medium'}
           sx={{
             position: 'fixed',
-            bottom: 24,
-            right: 24,
+            bottom: { xs: 16, sm: 24 },
+            right: { xs: 16, sm: 24 },
             display: { xs: 'flex', lg: 'none' },
             boxShadow: '0 8px 24px rgba(220, 38, 38, 0.5)',
             zIndex: 120,
           }}
         >
-          <Plus size={24} color="#ffffff" />
+          <Plus size={isMobile ? 18 : 22} color="#ffffff" />
         </Fab>
 
         {/* Material UI Responsive Add/Edit Dialog Modal */}
@@ -1506,11 +1647,11 @@ export default function DemonResponsiveAdminPage() {
             </DialogContent>
 
             <DialogActions sx={{ p: isMobile ? 1.5 : 2, borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#0f172a' }}>
-              <Button onClick={() => setIsModalOpen(false)} sx={{ color: '#cbd5e1' }}>
+              <Button onClick={() => setIsModalOpen(false)} size="small" sx={{ color: '#cbd5e1', fontSize: '0.78rem', minWidth: 'auto', px: 1.5 }}>
                 Cancel
               </Button>
-              <Button type="submit" variant="contained" color="primary" sx={{ px: 3, fontWeight: 800 }}>
-                {editingModel ? 'Save Changes' : 'Create Device'}
+              <Button type="submit" variant="contained" color="primary" size="small" sx={{ px: 2.5, py: 0.6, fontWeight: 800, fontSize: '0.78rem' }}>
+                {editingModel ? 'Save' : 'Create'}
               </Button>
             </DialogActions>
           </Box>
