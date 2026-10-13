@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Header } from '../../components/Header';
 import { useWizard } from '../../context/WizardContext';
-import { COMPANY_INFO, EMI_TENURES } from '../../data/catalog';
+import { COMPANY_INFO, EMI_TENURES, BRANDS } from '../../data/catalog';
 
 export default function CartPage() {
   const router = useRouter();
@@ -156,40 +156,76 @@ export default function CartPage() {
           /* Active Cart Item & Plan Breakdown */
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Device Card */}
-            <div
-              style={{
-                background: '#111219',
-                border: '1px solid rgba(212, 175, 55, 0.35)',
-                borderRadius: 18,
-                padding: '16px',
-                display: 'flex',
-                gap: 14,
-                boxShadow: '0 6px 24px rgba(0,0,0,0.4)',
-                position: 'relative'
-              }}
-            >
-              <div
-                style={{
-                  width: 72,
-                  height: 90,
-                  borderRadius: 12,
-                  background: 'radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, #08090d 80%)',
-                  border: '1px solid rgba(212, 175, 55, 0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 4,
-                  flexShrink: 0
-                }}
-              >
-                <img
-                  src={selectedModel.image}
-                  alt={selectedModel.name}
-                  style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
-                />
-              </div>
+            {(() => {
+              const brandObj = BRANDS.find((b) => b.id === selectedModel.brandId);
+              const brandLogo = brandObj?.logoUrl || '/apple-logo-white.png';
+              const isProductImage = selectedModel.image && !selectedModel.image.includes('apple.png') && !selectedModel.image.includes('logo') && !selectedModel.image.endsWith('.svg');
+              const displayImageSrc = isProductImage ? selectedModel.image : brandLogo;
 
-              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              return (
+                <div
+                  style={{
+                    background: '#111219',
+                    border: '1px solid rgba(212, 175, 55, 0.35)',
+                    borderRadius: 18,
+                    padding: '16px',
+                    display: 'flex',
+                    gap: 14,
+                    boxShadow: '0 6px 24px rgba(0,0,0,0.4)',
+                    position: 'relative',
+                    alignItems: 'center'
+                  }}
+                >
+                  {isProductImage ? (
+                    <div
+                      style={{
+                        width: 72,
+                        height: 90,
+                        borderRadius: 12,
+                        background: 'radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, #08090d 80%)',
+                        border: '1px solid rgba(212, 175, 55, 0.25)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: 4,
+                        flexShrink: 0
+                      }}
+                    >
+                      <img
+                        src={displayImageSrc}
+                        alt={selectedModel.name}
+                        style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        width: 56,
+                        height: 56,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        background: 'transparent',
+                        border: 'none',
+                        padding: 0
+                      }}
+                    >
+                      <img
+                        src={displayImageSrc}
+                        alt={brandObj?.name || selectedModel.name}
+                        style={{
+                          maxHeight: 46,
+                          maxWidth: 46,
+                          objectFit: 'contain',
+                          background: 'transparent',
+                          filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.2))'
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                   <span
                     style={{
@@ -257,6 +293,8 @@ export default function CartPage() {
                 </div>
               </div>
             </div>
+            );
+          })()}
 
             {/* Installment Scheme Summary Breakdown */}
             <div

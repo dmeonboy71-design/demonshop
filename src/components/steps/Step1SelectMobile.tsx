@@ -86,40 +86,47 @@ export const Step1SelectMobile: React.FC = () => {
               model.installments?.[12] || 
               Math.round((model.balance || (model.basePrice - downVal)) / 12);
 
+            // Check if model has a real product photo or uses brand logo/no image
+            const brandObj = BRANDS.find((b) => b.id === model.brandId);
+            const brandLogo = brandObj?.logoUrl || '/apple-logo-white.png';
+            const isProductImage = model.image && !model.image.includes('apple.png') && !model.image.includes('logo') && !model.image.endsWith('.svg');
+            const displayImageSrc = isProductImage ? model.image : brandLogo;
+
             return (
               <div
                 key={model.id}
                 className={`model-card-dark ${isSelected ? 'selected' : ''}`}
                 onClick={() => setSelectedModel(model)}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{
-                      width: 50,
-                      height: 50,
-                      borderRadius: 12,
-                      background: 'rgba(255,255,255,0.06)',
-                      border: '1px solid rgba(212,175,55,0.25)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <img
-                        src={model.image}
-                        alt={model.name}
-                        style={{ width: 28, height: 28, objectFit: 'contain' }}
-                      />
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                        <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#ffffff' }}>
+                <div className="model-card-top-row">
+                  <div className="model-card-info-wrap">
+                    {isProductImage ? (
+                      <div className="model-thumbnail-box">
+                        <img
+                          src={displayImageSrc}
+                          alt={model.name}
+                          className="model-thumb-img"
+                        />
+                      </div>
+                    ) : (
+                      <div className="model-brand-logo-frameless">
+                        <img
+                          src={displayImageSrc}
+                          alt={brandObj?.name || model.name}
+                          className="brand-logo-no-frame"
+                        />
+                      </div>
+                    )}
+                    <div className="model-title-desc-wrap">
+                      <div className="model-title-tags">
+                        <h3 className="model-name-text">
                           {model.name}
                         </h3>
                         <span className={`variant-tag ${variantClass}`}>
                           {model.variantType}
                         </span>
                       </div>
-                      <p style={{ fontSize: '11px', color: '#94a3b8', marginTop: 2 }}>
+                      <p className="model-specs-subtext">
                         {model.specs.slice(0, 2).join(' • ')}
                       </p>
                     </div>
@@ -131,11 +138,10 @@ export const Step1SelectMobile: React.FC = () => {
                       e.stopPropagation();
                       handleSelectAndProceed(model);
                     }}
-                    className="btn-gold-action"
-                    style={{ padding: '8px 14px', fontSize: '11px' }}
+                    className="btn-gold-action model-select-plan-btn"
                   >
                     <span>Plan</span>
-                    <ChevronRight size={14} />
+                    <ChevronRight size={13} />
                   </button>
                 </div>
 

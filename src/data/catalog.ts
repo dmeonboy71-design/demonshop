@@ -60,7 +60,7 @@ export interface WalletOption {
 }
 
 export const BRANDS: BrandOption[] = [
-  { id: 'apple', name: 'Apple iPhone', logoUrl: '/apple.png' },
+  { id: 'apple', name: 'Apple iPhone', logoUrl: '/apple-logo-white.png' },
   { id: 'samsung', name: 'Samsung', logoUrl: '/samsung.svg' },
   { id: 'google', name: 'Google Pixel', logoUrl: '/google-pixel.webp' },
   { id: 'oneplus', name: 'OnePlus', logoUrl: '/oneplus.png' },
@@ -846,6 +846,7 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     accountNumber: '78601004567890',
     accountTitle: 'INSTALMENT MOBILE LIMITED',
     code: 'RIDB',
+    logo: '/raqami-logo-card.png',
     type: 'bank' as const,
     featured: true
   },

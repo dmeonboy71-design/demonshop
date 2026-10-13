@@ -3,7 +3,7 @@
 import React from 'react';
 import { ChevronRight, ArrowLeft, Check, ShieldCheck, Sparkles } from 'lucide-react';
 import { useWizard } from '../../context/WizardContext';
-import { EMI_TENURES } from '../../data/catalog';
+import { EMI_TENURES, BRANDS } from '../../data/catalog';
 
 export const Step2SelectPlan: React.FC = () => {
   const {
@@ -56,22 +56,53 @@ export const Step2SelectPlan: React.FC = () => {
         alignItems: 'center',
         gap: '14px'
       }}>
-        <div style={{
-          width: 52,
-          height: 52,
-          borderRadius: 12,
-          background: 'rgba(255,255,255,0.06)',
-          border: '1px solid rgba(212,175,55,0.25)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <img
-            src={selectedModel.image}
-            alt={selectedModel.name}
-            style={{ width: 28, height: 28, objectFit: 'contain' }}
-          />
-        </div>
+        {(() => {
+          const brandObj = BRANDS.find((b) => b.id === selectedModel.brandId);
+          const brandLogo = brandObj?.logoUrl || '/apple-logo-white.png';
+          const isProductImage = selectedModel.image && !selectedModel.image.includes('apple.png') && !selectedModel.image.includes('logo') && !selectedModel.image.endsWith('.svg');
+          const displayImageSrc = isProductImage ? selectedModel.image : brandLogo;
+
+          return isProductImage ? (
+            <div style={{
+              width: 52,
+              height: 52,
+              borderRadius: 12,
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(212,175,55,0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <img
+                src={displayImageSrc}
+                alt={selectedModel.name}
+                style={{ width: 28, height: 28, objectFit: 'contain' }}
+              />
+            </div>
+          ) : (
+            <div style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'transparent',
+              border: 'none',
+              flexShrink: 0
+            }}>
+              <img
+                src={displayImageSrc}
+                alt={brandObj?.name || selectedModel.name}
+                style={{
+                  maxHeight: 36,
+                  maxWidth: 36,
+                  objectFit: 'contain',
+                  background: 'transparent'
+                }}
+              />
+            </div>
+          );
+        })()}
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#ffffff' }}>

@@ -306,8 +306,12 @@ export const Step0Landing: React.FC = () => {
           {/* Wide Featured Partner Card: Raqami Islamic Digital Bank */}
           <div className="featured-islamic-partner">
             <div className="raqami-card">
-              <div className="islamic-geom-rosette">
-                ✦
+              <div className="raqami-logo-img-wrap">
+                <img 
+                  src="/raqami-logo-card.png" 
+                  alt="Raqami Islamic Digital Bank" 
+                  className="raqami-logo-img" 
+                />
               </div>
               <div className="raqami-details">
                 <h5>Raqami Islamic Digital Bank</h5>
