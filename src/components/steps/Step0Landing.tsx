@@ -300,28 +300,23 @@ export const Step0Landing: React.FC = () => {
                 </div>
                 <span className="partner-brand-slogan">By JS Bank</span>
               </div>
-            </div>
-          </div>
 
-          {/* Wide Featured Partner Card: Raqami Islamic Digital Bank */}
-          <div className="featured-islamic-partner">
-            <div className="raqami-card">
-              <div className="raqami-logo-img-wrap">
+              {/* 6. Raqami Islamic Digital Bank (Beside Zindigi) */}
+              <div className="partner-logo-pill partner-logo-raqami">
                 <img 
                   src="/raqami-logo-card.png" 
                   alt="Raqami Islamic Digital Bank" 
-                  className="raqami-logo-img" 
+                  className="raqami-pill-logo-img" 
                 />
               </div>
-              <div className="raqami-details">
-                <h5>Raqami Islamic Digital Bank</h5>
-                <p>Shariah Compliant &nbsp;|&nbsp; Digital Banking</p>
-              </div>
             </div>
+          </div>
 
-            <div className="secure-badge-box">
+          {/* Secure Trust Strip */}
+          <div className="featured-islamic-partner">
+            <div className="secure-badge-box" style={{ width: '100%', justifyContent: 'center' }}>
               <ShieldCheck size={14} color="#34d399" />
-              <span>Secure &amp; Trusted Banking Partners</span>
+              <span>100% Secure &amp; Verified Official Banking Channels</span>
             </div>
           </div>
         </div>

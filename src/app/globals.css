@@ -727,9 +727,9 @@ body {
   gap: 6px;
 }
 
-@media (min-width: 480px) {
+@media (min-width: 580px) {
   .partner-logos-row {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
   }
 }
 
@@ -745,6 +745,17 @@ body {
   min-height: 48px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s;
+}
+
+.partner-logo-raqami {
+  padding: 4px 6px;
+}
+
+.raqami-pill-logo-img {
+  max-width: 100%;
+  max-height: 36px;
+  object-fit: contain;
+  display: block;
 }
 
 .partner-brand-name {
