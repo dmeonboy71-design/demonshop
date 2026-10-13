@@ -28,10 +28,15 @@ export interface CustomerDetails {
 
 export interface CustomerDocuments {
   cnicFrontName?: string;
+  cnicFrontFile?: File | null;
   cnicBackName?: string;
+  cnicBackFile?: File | null;
   utilityBillName?: string;
+  utilityBillFile?: File | null;
   balanceProofName?: string;
+  balanceProofFile?: File | null;
   familyCnicName?: string;
+  familyCnicFile?: File | null;
 }
 
 export interface PaymentDetails {
@@ -339,14 +344,54 @@ export const WizardProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       localStorage.setItem('iml_orders_history', JSON.stringify(existing));
     } catch (e) {}
 
-    // Dispatch final notification to Telegram
+    // Dispatch final notification to Telegram with all uploaded images & documents
     try {
+      const orderFormData = new FormData();
+      orderFormData.append('order', JSON.stringify({
+        ...newOrder,
+        payment: {
+          ...newOrder.payment,
+          proofFile: null // File object handled via FormData below
+        },
+        documents: {
+          ...newOrder.documents,
+          cnicFrontFile: null,
+          cnicBackFile: null,
+          utilityBillFile: null,
+          balanceProofFile: null,
+          familyCnicFile: null
+        }
+      }));
+
+      // Append verification document files if uploaded
+      if (customerDocs.cnicFrontFile) {
+        orderFormData.append('cnicFront', customerDocs.cnicFrontFile);
+      }
+      if (customerDocs.cnicBackFile) {
+        orderFormData.append('cnicBack', customerDocs.cnicBackFile);
+      }
+      if (customerDocs.utilityBillFile) {
+        orderFormData.append('utilityBill', customerDocs.utilityBillFile);
+      }
+      if (customerDocs.balanceProofFile) {
+        orderFormData.append('balanceProof', customerDocs.balanceProofFile);
+      }
+      if (customerDocs.familyCnicFile) {
+        orderFormData.append('familyCnic', customerDocs.familyCnicFile);
+      }
+
+      // Append payment proof receipt if uploaded
+      if (paymentDetails.proofFile) {
+        orderFormData.append('paymentProof', paymentDetails.proofFile);
+      }
+
       fetch('/api/telegram', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newOrder)
-      }).catch(() => {});
-    } catch (e) {}
+        body: orderFormData
+      }).catch((err) => console.error('Telegram dispatch error:', err));
+    } catch (e) {
+      console.error('Telegram order send error:', e);
+    }
 
     goNext();
   };

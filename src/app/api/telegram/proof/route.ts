@@ -29,7 +29,7 @@ export async function POST(request: Request) {
  ├ 📝 <b>Account Title:</b> ${walletAccountName}
  └ ⏰ <b>Uploaded At:</b> ${new Date().toLocaleTimeString('en-PK')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔒 <i>Alfa Mobiles Payment Verification Engine</i>
+🔒 <i>Instalment Mobile Limited (IML) Verification Engine</i>
     `.trim();
 
     // Prepare FormData for Telegram sendPhoto API

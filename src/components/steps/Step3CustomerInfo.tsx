@@ -35,9 +35,17 @@ export const Step3CustomerInfo: React.FC = () => {
     }
   };
 
-  const handleDocUpload = (docKey: keyof typeof customerDocs, file: File | null) => {
+  const handleDocUpload = (
+    docNameKey: 'cnicFrontName' | 'cnicBackName' | 'utilityBillName' | 'balanceProofName' | 'familyCnicName',
+    docFileKey: 'cnicFrontFile' | 'cnicBackFile' | 'utilityBillFile' | 'balanceProofFile' | 'familyCnicFile',
+    file: File | null
+  ) => {
     if (file) {
-      setCustomerDocs((prev) => ({ ...prev, [docKey]: file.name }));
+      setCustomerDocs((prev) => ({ 
+        ...prev, 
+        [docNameKey]: file.name,
+        [docFileKey]: file 
+      }));
     }
   };
 
@@ -177,7 +185,7 @@ export const Step3CustomerInfo: React.FC = () => {
               type="file"
               accept="image/*,.pdf"
               style={{ display: 'none' }}
-              onChange={(e) => handleDocUpload('cnicFrontName', e.target.files?.[0] || null)}
+              onChange={(e) => handleDocUpload('cnicFrontName', 'cnicFrontFile', e.target.files?.[0] || null)}
             />
           </label>
         </div>
@@ -200,7 +208,7 @@ export const Step3CustomerInfo: React.FC = () => {
               type="file"
               accept="image/*,.pdf"
               style={{ display: 'none' }}
-              onChange={(e) => handleDocUpload('utilityBillName', e.target.files?.[0] || null)}
+              onChange={(e) => handleDocUpload('utilityBillName', 'utilityBillFile', e.target.files?.[0] || null)}
             />
           </label>
         </div>
@@ -223,7 +231,7 @@ export const Step3CustomerInfo: React.FC = () => {
               type="file"
               accept="image/*,.pdf"
               style={{ display: 'none' }}
-              onChange={(e) => handleDocUpload('familyCnicName', e.target.files?.[0] || null)}
+              onChange={(e) => handleDocUpload('familyCnicName', 'familyCnicFile', e.target.files?.[0] || null)}
             />
           </label>
         </div>
@@ -246,7 +254,7 @@ export const Step3CustomerInfo: React.FC = () => {
               type="file"
               accept="image/*,.pdf"
               style={{ display: 'none' }}
-              onChange={(e) => handleDocUpload('balanceProofName', e.target.files?.[0] || null)}
+              onChange={(e) => handleDocUpload('balanceProofName', 'balanceProofFile', e.target.files?.[0] || null)}
             />
           </label>
         </div>
