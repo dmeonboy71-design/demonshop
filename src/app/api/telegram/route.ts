@@ -106,61 +106,175 @@ export async function POST(request: Request) {
     messageText += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     messageText += `⏳ <i>Status: Awaiting Verification & Dispatch</i>`;
 
-    // 2. Send Primary Text Notification
-    const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-    const textRes = await fetch(telegramUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: messageText,
-        parse_mode: 'HTML'
-      })
-    });
+    // Build compact HTML message for caption (safe within Telegram's 1024-character media caption limit)
+    const captionLines = [
+      `👑 <b>INSTALMENT MOBILE LIMITED (IML)</b>`,
+      `🎉 <b>NEW OFFICIAL APPLICATION (#${orderId})</b>`,
+      `🕒 <b>Date:</b> ${createdAt || new Date().toLocaleString('en-PK')}`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `📱 <b>DEVICE & PLAN:</b>`,
+      ` ├ 🏷️ <b>Model:</b> ${model?.name || 'iPhone'} (${model?.variantType || 'PTA Approved'})`,
+      ` ├ 🎨 <b>Color:</b> ${color?.name || 'Standard'} | 💾 <b>Storage:</b> ${storage?.size || 'Standard'}`,
+      ` ├ 💵 <b>Total:</b> PKR ${(totalPrice || 0).toLocaleString('en-PK')} | 💳 <b>Down:</b> PKR ${(downPayment || 0).toLocaleString('en-PK')}`,
+      ` └ 📅 <b>EMI:</b> ${months || 12} Mos @ PKR ${(monthlyEmi || 0).toLocaleString('en-PK')}/mo`,
+      ``,
+      `👤 <b>CUSTOMER DETAILS:</b>`,
+      ` ├ 📛 <b>Name:</b> ${customer?.fullName || 'N/A'}`,
+      ` ├ 🪪 <b>CNIC:</b> <code>${customer?.cnic || 'N/A'}</code>`,
+      ` ├ 📞 <b>Phone:</b> <code>${customer?.mobileNumber || 'N/A'}</code>`,
+      ` ├ 🏠 <b>Address:</b> ${customer?.deliveryAddress || 'N/A'}`,
+      ` └ 🚚 <b>Delivery:</b> ${customer?.deliveryType === 'open_parcel' ? '🔍 Open Parcel TCS Inspection' : '📦 Insured Sealed'}`,
+      ``,
+      `💳 <b>PAYMENT DETAILS:</b>`,
+      ` ├ 🏛️ <b>Channel:</b> ${(payment?.channel || customer?.paymentMethod || 'easypaisa').toUpperCase()}`,
+      ` ├ 🔢 <b>Sender Acc:</b> <code>${payment?.senderAccount || 'N/A'}</code>`,
+      ` ├ 🔖 <b>Tx ID:</b> <code>${payment?.transactionId || 'N/A'}</code>`,
+      ` └ 📸 <b>Files:</b> ${files.length > 0 ? `${files.length} uploaded in this album` : 'None'}`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `⏳ <i>Status: Awaiting Verification & Dispatch</i>`
+    ];
 
-    const textData = await textRes.json();
-    let textMessageId = textData.ok ? textData.result.message_id : null;
+    let fullCaption = captionLines.join('\n');
+    // Ensure caption does not exceed Telegram's 1024 char limit
+    if (fullCaption.length > 1020) {
+      fullCaption = fullCaption.slice(0, 1017) + '...';
+    }
 
-    // 3. Send all uploaded images/documents to Telegram (sendPhoto or sendDocument)
-    const uploadedImagesResults = [];
-    for (const item of files) {
+    const isImageFile = (f: File) => {
+      return (f.type && f.type.startsWith('image/')) || /\.(jpe?g|png|webp|gif|bmp)$/i.test(f.name);
+    };
+
+    const imageFiles = files.filter(f => isImageFile(f.file));
+    const docFiles = files.filter(f => !isImageFile(f.file));
+
+    let telegramSuccess = false;
+    let mainMessageId: number | null = null;
+    const mediaResults: any[] = [];
+
+    // SCENARIO 1: We have image files (at least 1). Group all images together!
+    if (imageFiles.length >= 2) {
       try {
-        const fileFormData = new FormData();
-        fileFormData.append('chat_id', chatId);
-        fileFormData.append('parse_mode', 'HTML');
-        if (textMessageId) {
-          fileFormData.append('reply_to_message_id', String(textMessageId));
+        const mediaGroupFormData = new FormData();
+        mediaGroupFormData.append('chat_id', chatId);
+
+        const mediaGroupArray = imageFiles.slice(0, 10).map((item, index) => {
+          const attachKey = `photo_${index}`;
+          mediaGroupFormData.append(attachKey, item.file, item.file.name);
+          return {
+            type: 'photo',
+            media: `attach://${attachKey}`,
+            caption: index === 0 ? fullCaption : `${item.label} (#${orderId})`,
+            parse_mode: 'HTML'
+          };
+        });
+
+        mediaGroupFormData.append('media', JSON.stringify(mediaGroupArray));
+
+        const groupRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMediaGroup`, {
+          method: 'POST',
+          body: mediaGroupFormData
+        });
+
+        const groupData = await groupRes.json();
+        if (groupData.ok) {
+          telegramSuccess = true;
+          mainMessageId = Array.isArray(groupData.result) ? groupData.result[0]?.message_id : null;
+          mediaResults.push({ type: 'mediaGroup', success: true, count: imageFiles.length });
+        } else {
+          console.warn('sendMediaGroup failed, attempting fallback:', groupData);
+          throw new Error(groupData.description || 'sendMediaGroup failed');
+        }
+      } catch (err: any) {
+        console.error('sendMediaGroup error, running fallback:', err);
+        // Fallback: Send single text then individual photos
+        const fallbackRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: fullCaption, parse_mode: 'HTML' })
+        });
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.ok) {
+          telegramSuccess = true;
+          mainMessageId = fallbackData.result.message_id;
         }
 
-        const isImage = item.file.type.startsWith('image/');
-        const caption = `${item.label} for Order <b>#${orderId}</b> (${customer?.fullName || 'Customer'})`;
-        fileFormData.append('caption', caption);
+        // Send photos individually
+        for (const item of imageFiles) {
+          const fd = new FormData();
+          fd.append('chat_id', chatId);
+          if (mainMessageId) fd.append('reply_to_message_id', String(mainMessageId));
+          fd.append('caption', `${item.label} for #${orderId}`);
+          fd.append('photo', item.file, item.file.name);
+          await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, { method: 'POST', body: fd });
+        }
+      }
+    } else if (imageFiles.length === 1) {
+      // Single image: sendPhoto with the full order caption attached
+      try {
+        const singlePhotoFormData = new FormData();
+        singlePhotoFormData.append('chat_id', chatId);
+        singlePhotoFormData.append('photo', imageFiles[0].file, imageFiles[0].file.name);
+        singlePhotoFormData.append('caption', fullCaption);
+        singlePhotoFormData.append('parse_mode', 'HTML');
 
-        let endpoint = isImage ? 'sendPhoto' : 'sendDocument';
-        fileFormData.append(isImage ? 'photo' : 'document', item.file, item.file.name);
-
-        const uploadRes = await fetch(`https://api.telegram.org/bot${botToken}/${endpoint}`, {
+        const singleRes = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
           method: 'POST',
-          body: fileFormData
+          body: singlePhotoFormData
         });
+        const singleData = await singleRes.json();
+        if (singleData.ok) {
+          telegramSuccess = true;
+          mainMessageId = singleData.result.message_id;
+          mediaResults.push({ type: 'singlePhoto', success: true });
+        } else {
+          throw new Error(singleData.description);
+        }
+      } catch (err) {
+        // Fallback to text message
+        const textRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: fullCaption, parse_mode: 'HTML' })
+        });
+        const textData = await textRes.json();
+        telegramSuccess = textData.ok;
+      }
+    } else {
+      // No images uploaded: send text notification
+      const textRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: fullCaption, parse_mode: 'HTML' })
+      });
+      const textData = await textRes.json();
+      telegramSuccess = textData.ok;
+      if (textData.ok) mainMessageId = textData.result.message_id;
+    }
 
-        const uploadData = await uploadRes.json();
-        uploadedImagesResults.push({
-          fieldName: item.fieldName,
-          success: uploadData.ok,
-          messageId: uploadData.ok ? uploadData.result.message_id : null
+    // SCENARIO 2: Non-image documents (e.g. PDF utility bills / bank statements)
+    for (const doc of docFiles) {
+      try {
+        const docFormData = new FormData();
+        docFormData.append('chat_id', chatId);
+        if (mainMessageId) docFormData.append('reply_to_message_id', String(mainMessageId));
+        docFormData.append('caption', `${doc.label} (#${orderId})`);
+        docFormData.append('document', doc.file, doc.file.name);
+        await fetch(`https://api.telegram.org/bot${botToken}/sendDocument`, {
+          method: 'POST',
+          body: docFormData
         });
-      } catch (err: any) {
-        console.error(`Error uploading ${item.fieldName} to Telegram:`, err);
-        uploadedImagesResults.push({ fieldName: item.fieldName, success: false, error: err.message });
+      } catch (docErr) {
+        console.error('Error sending doc to Telegram:', docErr);
       }
     }
 
     return NextResponse.json({ 
-      success: textData.ok, 
-      textMessageId, 
-      uploadedImagesCount: uploadedImagesResults.filter(r => r.success).length,
-      uploadedImagesResults 
+      success: telegramSuccess, 
+      mainMessageId, 
+      filesReceived: files.length,
+      imageCount: imageFiles.length,
+      docCount: docFiles.length,
+      mediaResults 
     });
   } catch (error: any) {
     console.error('Server Telegram route error:', error);

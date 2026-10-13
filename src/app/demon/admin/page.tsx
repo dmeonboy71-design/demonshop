@@ -135,6 +135,7 @@ const PRESET_COLORS: ColorOption[] = [
 
 export default function DemonResponsiveAdminPage() {
   const { modelsList, addModel, updateModel, deleteModel, resetCatalog } = useWizard();
+  const isMobile = useMediaQuery('(max-width:640px)');
 
   // Navigation Sidebar state (mobile drawer)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -617,8 +618,8 @@ export default function DemonResponsiveAdminPage() {
                 </Box>
 
                 {/* Brand & Series Select Filters */}
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <FormControl size="small" sx={{ minWidth: 130, flex: { xs: 1, sm: 'none' } }}>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: { xs: 'nowrap', sm: 'wrap' }, width: { xs: '100%', sm: 'auto' } }}>
+                  <FormControl size="small" sx={{ flex: 1, minWidth: 0 }}>
                     <Select
                       value={selectedBrandFilter}
                       onChange={(e) => {
@@ -628,26 +629,26 @@ export default function DemonResponsiveAdminPage() {
                       sx={{
                         backgroundColor: 'rgba(0, 0, 0, 0.35)',
                         borderRadius: 2.5,
-                        fontSize: '0.825rem',
+                        fontSize: '0.8rem',
                         color: '#ffffff',
                         '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.15)' },
                       }}
                     >
-                      <MenuItem value="all">All Brands ({BRANDS.length})</MenuItem>
+                      <MenuItem value="all">All Brands</MenuItem>
                       {BRANDS.map((b) => (
                         <MenuItem key={b.id} value={b.id}>{b.name}</MenuItem>
                       ))}
                     </Select>
                   </FormControl>
 
-                  <FormControl size="small" sx={{ minWidth: 120, flex: { xs: 1, sm: 'none' } }}>
+                  <FormControl size="small" sx={{ flex: 1, minWidth: 0 }}>
                     <Select
                       value={selectedSeriesFilter}
                       onChange={(e) => setSelectedSeriesFilter(e.target.value)}
                       sx={{
                         backgroundColor: 'rgba(0, 0, 0, 0.35)',
                         borderRadius: 2.5,
-                        fontSize: '0.825rem',
+                        fontSize: '0.8rem',
                         color: '#ffffff',
                         '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.15)' },
                       }}
@@ -667,6 +668,7 @@ export default function DemonResponsiveAdminPage() {
                       border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: 2.5,
                       p: 0.3,
+                      flexShrink: 0,
                     }}
                   >
                     <IconButton
@@ -759,7 +761,7 @@ export default function DemonResponsiveAdminPage() {
                           mb: 3,
                         }}
                       >
-                        <Table size="small" aria-label="Device Catalog Table">
+                        <Table size="small" aria-label="Device Catalog Table" sx={{ minWidth: 650 }}>
                           <TableHead sx={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}>
                             <TableRow>
                               <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.75rem' }}>DEVICE</TableCell>
@@ -1137,41 +1139,71 @@ export default function DemonResponsiveAdminPage() {
                   Storage & RAM Configurations Matrix
                 </Typography>
 
-                <TableContainer component={Paper} sx={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 3, border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <Table size="small">
-                    <TableHead sx={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
-                      <TableRow>
-                        <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }}>DEVICE MODEL</TableCell>
-                        <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }}>BASE CASH PRICE</TableCell>
-                        <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }}>AVAILABLE VARIANTS & DELTAS</TableCell>
-                        <TableCell align="right" sx={{ color: '#94a3b8', fontWeight: 700 }}>ACTION</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {modelsList.map((m) => (
-                        <TableRow key={m.id} hover>
-                          <TableCell sx={{ color: '#ffffff', fontWeight: 800 }}>{m.name}</TableCell>
-                          <TableCell sx={{ color: '#f43f5e', fontWeight: 700 }}>Rs. {m.basePrice.toLocaleString('en-PK')}</TableCell>
-                          <TableCell>
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
-                              {m.storageOptions?.map((st, i) => (
-                                <Chip
-                                  key={i}
-                                  label={`${st.size} ${st.priceDelta > 0 ? `(+Rs. ${st.priceDelta.toLocaleString('en-PK')})` : '(Base)'}`}
-                                  size="small"
-                                  sx={{ backgroundColor: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', fontSize: '0.725rem' }}
-                                />
-                              ))}
-                            </Box>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Button size="small" onClick={() => handleOpenEditModal(m)} sx={{ color: '#818cf8' }}>Manage</Button>
-                          </TableCell>
+                {isMobile ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    {modelsList.map((m) => (
+                      <Card key={m.id} sx={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 3, p: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.2 }}>
+                          <Box>
+                            <Typography variant="subtitle2" sx={{ color: '#ffffff', fontWeight: 800 }}>{m.name}</Typography>
+                            <Typography variant="caption" sx={{ color: '#f43f5e', fontWeight: 700, fontSize: '0.8rem' }}>
+                              Base: Rs. {m.basePrice.toLocaleString('en-PK')}
+                            </Typography>
+                          </Box>
+                          <Button size="small" onClick={() => handleOpenEditModal(m)} sx={{ color: '#818cf8', py: 0.4, px: 1.2, backgroundColor: 'rgba(99, 102, 241, 0.12)' }}>
+                            Edit
+                          </Button>
+                        </Box>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, mt: 1 }}>
+                          {m.storageOptions?.map((st, i) => (
+                            <Chip
+                              key={i}
+                              label={`${st.size} ${st.priceDelta > 0 ? `(+Rs. ${st.priceDelta.toLocaleString('en-PK')})` : '(Base)'}`}
+                              size="small"
+                              sx={{ backgroundColor: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', fontSize: '0.725rem', fontWeight: 600 }}
+                            />
+                          ))}
+                        </Box>
+                      </Card>
+                    ))}
+                  </Box>
+                ) : (
+                  <TableContainer component={Paper} sx={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 3, border: '1px solid rgba(255,255,255,0.08)', overflowX: 'auto' }}>
+                    <Table size="small" sx={{ minWidth: 550 }}>
+                      <TableHead sx={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
+                        <TableRow>
+                          <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }}>DEVICE MODEL</TableCell>
+                          <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }}>BASE CASH PRICE</TableCell>
+                          <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }}>AVAILABLE VARIANTS & DELTAS</TableCell>
+                          <TableCell align="right" sx={{ color: '#94a3b8', fontWeight: 700 }}>ACTION</TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                      </TableHead>
+                      <TableBody>
+                        {modelsList.map((m) => (
+                          <TableRow key={m.id} hover>
+                            <TableCell sx={{ color: '#ffffff', fontWeight: 800 }}>{m.name}</TableCell>
+                            <TableCell sx={{ color: '#f43f5e', fontWeight: 700 }}>Rs. {m.basePrice.toLocaleString('en-PK')}</TableCell>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
+                                {m.storageOptions?.map((st, i) => (
+                                  <Chip
+                                    key={i}
+                                    label={`${st.size} ${st.priceDelta > 0 ? `(+Rs. ${st.priceDelta.toLocaleString('en-PK')})` : '(Base)'}`}
+                                    size="small"
+                                    sx={{ backgroundColor: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', fontSize: '0.725rem' }}
+                                  />
+                                ))}
+                              </Box>
+                            </TableCell>
+                            <TableCell align="right">
+                              <Button size="small" onClick={() => handleOpenEditModal(m)} sx={{ color: '#818cf8' }}>Manage</Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
               </Box>
             )}
 
@@ -1244,26 +1276,25 @@ export default function DemonResponsiveAdminPage() {
           open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           fullWidth
+          fullScreen={isMobile}
           maxWidth="sm"
           PaperProps={{
             sx: {
               backgroundColor: '#0f172a',
               backgroundImage: 'none',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRadius: { xs: '20px 20px 0 0', sm: 4 },
-              m: { xs: 0, sm: 2 },
-              position: { xs: 'fixed', sm: 'relative' },
-              bottom: { xs: 0, sm: 'auto' },
-              maxHeight: { xs: '90vh', sm: '85vh' },
+              border: isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: isMobile ? 0 : 4,
+              m: isMobile ? 0 : 2,
+              maxHeight: isMobile ? '100%' : '85vh',
             },
           }}
         >
-          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', pb: 1 }}>
+          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', pb: 1, pt: isMobile ? 2 : 2.5, px: isMobile ? 2 : 3 }}>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 900, color: '#ffffff', fontSize: '1.2rem' }}>
+              <Typography variant="h6" sx={{ fontWeight: 900, color: '#ffffff', fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
                 {editingModel ? `Edit ${editingModel.name}` : 'Add New Mobile Device'}
               </Typography>
-              <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+              <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.75rem' }}>
                 Configure specs, colors, storage variants, image source & prices.
               </Typography>
             </Box>
@@ -1272,8 +1303,8 @@ export default function DemonResponsiveAdminPage() {
             </IconButton>
           </DialogTitle>
 
-          <Box component="form" onSubmit={handleSaveModel}>
-            <DialogContent dividers sx={{ borderColor: 'rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 2, py: 2 }}>
+          <Box component="form" onSubmit={handleSaveModel} sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+            <DialogContent dividers sx={{ borderColor: 'rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 2, py: 2, px: isMobile ? 2 : 3, overflowY: 'auto', flex: 1 }}>
               
               {/* Brand & Series Responsive Selects */}
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
@@ -1406,24 +1437,26 @@ export default function DemonResponsiveAdminPage() {
                   ))}
                 </Box>
 
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
                   <TextField
                     size="small"
                     placeholder="Color Name (Cobalt Blue)"
                     value={newColorName}
                     onChange={(e) => setNewColorName(e.target.value)}
-                    sx={{ flex: 1, '& input': { p: 0.8, fontSize: '0.8rem' } }}
+                    sx={{ flex: { xs: '1 1 140px', sm: 1 }, '& input': { p: 0.8, fontSize: '0.8rem' } }}
                     InputProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 2, color: '#ffffff' } }}
                   />
-                  <input
-                    type="color"
-                    value={newColorHex}
-                    onChange={(e) => setNewColorHex(e.target.value)}
-                    style={{ width: 36, height: 36, border: 'none', background: 'transparent', cursor: 'pointer' }}
-                  />
-                  <Button size="small" variant="outlined" onClick={handleAddColorToForm} sx={{ color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.2)' }}>
-                    + Color
-                  </Button>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <input
+                      type="color"
+                      value={newColorHex}
+                      onChange={(e) => setNewColorHex(e.target.value)}
+                      style={{ width: 36, height: 36, border: 'none', background: 'transparent', cursor: 'pointer', borderRadius: 4 }}
+                    />
+                    <Button size="small" variant="outlined" onClick={handleAddColorToForm} sx={{ color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.2)', whiteSpace: 'nowrap' }}>
+                      + Color
+                    </Button>
+                  </Box>
                 </Box>
               </Box>
 
@@ -1446,13 +1479,13 @@ export default function DemonResponsiveAdminPage() {
                   ))}
                 </Box>
 
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
                   <TextField
                     size="small"
                     placeholder="Variant (12/512GB)"
                     value={newStorageSize}
                     onChange={(e) => setNewStorageSize(e.target.value)}
-                    sx={{ flex: 1, '& input': { p: 0.8, fontSize: '0.8rem' } }}
+                    sx={{ flex: { xs: '1 1 120px', sm: 1 }, '& input': { p: 0.8, fontSize: '0.8rem' } }}
                     InputProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 2, color: '#ffffff' } }}
                   />
                   <TextField
@@ -1461,10 +1494,10 @@ export default function DemonResponsiveAdminPage() {
                     placeholder="+Delta"
                     value={newPriceDelta}
                     onChange={(e) => setNewPriceDelta(Number(e.target.value))}
-                    sx={{ width: 100, '& input': { p: 0.8, fontSize: '0.8rem' } }}
+                    sx={{ width: { xs: 85, sm: 100 }, '& input': { p: 0.8, fontSize: '0.8rem' } }}
                     InputProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 2, color: '#ffffff' } }}
                   />
-                  <Button size="small" variant="outlined" onClick={handleAddStorageToForm} sx={{ color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.2)' }}>
+                  <Button size="small" variant="outlined" onClick={handleAddStorageToForm} sx={{ color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.2)', whiteSpace: 'nowrap' }}>
                     + Variant
                   </Button>
                 </Box>
@@ -1472,7 +1505,7 @@ export default function DemonResponsiveAdminPage() {
 
             </DialogContent>
 
-            <DialogActions sx={{ p: 2, borderColor: 'rgba(255,255,255,0.08)' }}>
+            <DialogActions sx={{ p: isMobile ? 1.5 : 2, borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#0f172a' }}>
               <Button onClick={() => setIsModalOpen(false)} sx={{ color: '#cbd5e1' }}>
                 Cancel
               </Button>
