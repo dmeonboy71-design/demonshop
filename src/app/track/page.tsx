@@ -77,7 +77,7 @@ export default function TrackPage() {
                 type="text"
                 value={searchOrderId}
                 onChange={(e) => setSearchOrderId(e.target.value)}
-                placeholder="e.g. IML-261013-4821"
+                placeholder="IML-261013-4821"
                 className="form-input-dark"
               />
             </div>
@@ -92,7 +92,7 @@ export default function TrackPage() {
                 type="tel"
                 value={searchPhone}
                 onChange={(e) => setSearchPhone(e.target.value)}
-                placeholder="e.g. 03450941134"
+                placeholder="03450941134"
                 className="form-input-dark"
               />
             </div>

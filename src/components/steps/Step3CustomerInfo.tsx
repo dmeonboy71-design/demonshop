@@ -105,7 +105,7 @@ export const Step3CustomerInfo: React.FC = () => {
             className="form-input-dark"
             value={customerDetails.fullName}
             onChange={(e) => handleInputChange('fullName', e.target.value)}
-            placeholder="e.g. Muhammad Ali Shah"
+            placeholder="Muhammad Ali Shah"
           />
         </div>
 
@@ -140,7 +140,7 @@ export const Step3CustomerInfo: React.FC = () => {
             className="form-input-dark"
             value={customerDetails.deliveryAddress}
             onChange={(e) => handleInputChange('deliveryAddress', e.target.value)}
-            placeholder="House #, Street, Block / Sector, City (e.g. Gulberg III, Lahore)"
+            placeholder="House #, Street, Block / Sector, City"
           />
         </div>
       </div>

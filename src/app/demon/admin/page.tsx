@@ -1321,7 +1321,7 @@ export default function DemonResponsiveAdminPage() {
                   fullWidth
                   size="small"
                   required
-                  placeholder="e.g. S-25 Ultra 12/512 or iPhone 17 Pro"
+                  placeholder="S-25 Ultra 12/512 or iPhone 17 Pro"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   InputProps={{
@@ -1339,7 +1339,7 @@ export default function DemonResponsiveAdminPage() {
                     size="small"
                     type="number"
                     required
-                    placeholder="e.g. 128000"
+                    placeholder="128000"
                     value={formData.basePrice}
                     onChange={(e) => setFormData({ ...formData, basePrice: Number(e.target.value) })}
                     InputProps={{
@@ -1409,7 +1409,7 @@ export default function DemonResponsiveAdminPage() {
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                   <TextField
                     size="small"
-                    placeholder="Color Name (e.g. Cobalt Blue)"
+                    placeholder="Color Name (Cobalt Blue)"
                     value={newColorName}
                     onChange={(e) => setNewColorName(e.target.value)}
                     sx={{ flex: 1, '& input': { p: 0.8, fontSize: '0.8rem' } }}
@@ -1449,7 +1449,7 @@ export default function DemonResponsiveAdminPage() {
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                   <TextField
                     size="small"
-                    placeholder="Variant (e.g. 12/512GB)"
+                    placeholder="Variant (12/512GB)"
                     value={newStorageSize}
                     onChange={(e) => setNewStorageSize(e.target.value)}
                     sx={{ flex: 1, '& input': { p: 0.8, fontSize: '0.8rem' } }}

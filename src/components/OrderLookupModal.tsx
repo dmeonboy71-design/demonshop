@@ -102,7 +102,7 @@ export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ isOpen, onCl
           Track Your Installment Order
         </h3>
         <p style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '18px' }}>
-          Enter your Order ID (e.g. IML-261013-1234) or registered Mobile Number.
+          Enter your Order ID (IML-261013-1234) or registered Mobile Number.
         </p>
 
         <form onSubmit={handleSearch} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '18px' }}>
@@ -112,7 +112,7 @@ export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ isOpen, onCl
               type="text"
               value={searchOrderId}
               onChange={(e) => setSearchOrderId(e.target.value)}
-              placeholder="e.g. IML-261013-4821"
+              placeholder="IML-261013-4821"
               className="form-input-dark"
             />
           </div>
@@ -127,7 +127,7 @@ export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ isOpen, onCl
               type="tel"
               value={searchPhone}
               onChange={(e) => setSearchPhone(e.target.value)}
-              placeholder="e.g. 03450941134"
+              placeholder="03450941134"
               className="form-input-dark"
             />
           </div>

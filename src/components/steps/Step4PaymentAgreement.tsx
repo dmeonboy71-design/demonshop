@@ -296,7 +296,7 @@ export const Step4PaymentAgreement: React.FC = () => {
             <input
               type="text"
               className="form-input-dark"
-              placeholder="e.g. 0345-xxxxxxx or Bank Account"
+              placeholder="0345-xxxxxxx or Bank Account"
               value={paymentDetails.senderAccount}
               onChange={(e) => handleInputChange('senderAccount', e.target.value)}
             />
@@ -307,7 +307,7 @@ export const Step4PaymentAgreement: React.FC = () => {
             <input
               type="text"
               className="form-input-dark"
-              placeholder="e.g. TID-982341829 or Trx ID"
+              placeholder="TID-982341829 or Trx ID"
               value={paymentDetails.transactionId}
               onChange={(e) => handleInputChange('transactionId', e.target.value)}
             />
