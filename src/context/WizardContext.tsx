@@ -205,7 +205,7 @@ export const WizardProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     channel: 'easypaisa',
     bankId: 'askari',
     walletType: 'easypaisa',
-    accountNumber: '03450941134',
+    accountNumber: '03450951134',
     accountTitle: 'INSTALMENT MOBILE LIMITED',
     senderAccount: '',
     transactionId: '',

@@ -265,6 +265,28 @@ export const Step4PaymentAgreement: React.FC = () => {
           </span>
         </div>
 
+        {selectedChannel === 'easypaisa' && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 78, 59, 0.25) 100%)',
+            border: '1.5px solid #10b981',
+            borderRadius: '12px',
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+          }}>
+            <ShieldCheck size={24} color="#10b981" style={{ flexShrink: 0 }} />
+            <div>
+              <div style={{ fontSize: '12px', fontWeight: 800, color: '#34d399', letterSpacing: '0.3px' }}>
+                Contact your agent for Payment verification
+              </div>
+              <div style={{ fontSize: '13px', fontWeight: 900, color: '#ffffff', marginTop: 2 }}>
+                Verification Code: <span style={{ color: 'var(--gold-light)', fontSize: '15px', letterSpacing: '1px' }}>03450951134</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div style={{
           background: 'rgba(255, 255, 255, 0.04)',
           borderRadius: '12px',
@@ -278,11 +300,19 @@ export const Step4PaymentAgreement: React.FC = () => {
             <strong style={{ fontSize: '12px', color: '#ffffff' }}>{activeChannelConfig.accountTitle}</strong>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '11px', color: '#94a3b8' }}>Account / IBAN / Wallet #:</span>
+            <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+              {selectedChannel === 'easypaisa' ? 'Easypaisa / Agent #:' : 'Account / IBAN / Wallet #:'}
+            </span>
             <strong style={{ fontSize: '13px', color: 'var(--gold-light)', letterSpacing: '0.5px' }}>
               {activeChannelConfig.accountNumber}
             </strong>
           </div>
+          {selectedChannel === 'easypaisa' && (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Agent Verification:</span>
+              <strong style={{ fontSize: '11px', color: '#34d399' }}>03450951134</strong>
+            </div>
+          )}
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ fontSize: '11px', color: '#94a3b8' }}>Deposit Purpose:</span>
             <span style={{ fontSize: '11px', color: '#cbd5e1' }}>Down Payment - {selectedModel?.name}</span>

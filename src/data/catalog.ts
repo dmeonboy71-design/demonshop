@@ -797,8 +797,8 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     id: 'easypaisa',
     name: 'Easypaisa',
     category: 'Digital Wallet',
-    tagline: 'Khushiyon Bhara Aghez',
-    accountNumber: '03450941134',
+    tagline: 'Contact your agent for Payment verification',
+    accountNumber: '03450951134',
     accountTitle: 'INSTALMENT MOBILE LIMITED',
     logo: '/easypaisa.webp',
     type: 'wallet' as const,
@@ -891,8 +891,8 @@ export const MOBILE_WALLETS: WalletOption[] = [
   {
     id: 'easypaisa',
     name: 'Easypaisa',
-    tagline: 'Khushiyon Bhara Aghez',
-    accountNumber: '0345 0941134',
+    tagline: 'Contact your agent for Payment verification',
+    accountNumber: '0345 0951134',
     accountTitle: 'INSTALMENT MOBILE LIMITED',
     fee: '0%',
     logo: '/easypaisa.webp'
@@ -918,7 +918,7 @@ export const MOBILE_WALLETS: WalletOption[] = [
     id: 'alfalah_wallet',
     name: 'Bank Alfalah Alfa Wallet',
     tagline: 'Alfa Digital Account',
-    accountNumber: '0345 0941134',
+    accountNumber: '0345 0951134',
     accountTitle: 'INSTALMENT MOBILE LIMITED',
     fee: '0%',
     logo: '/alflah.png'
@@ -930,9 +930,9 @@ export const COMPANY_INFO = {
   shortName: 'IML',
   tagline: 'Official iPhone Installment Plans & Pricing Structure',
   subTagline: 'Premium • readable • customer-ready',
-  phone1: '+92 345 0941134',
+  phone1: '+92 345 0951134',
   phone2: '+92 301 3136354',
-  whatsapp: '+92 345 0941134',
+  whatsapp: '+92 345 0951134',
   email: 'support@instalmentmobile.pk',
   address: 'Suite #402, 4th Floor, Hafeez Center, Main Boulevard, Gulberg III, Lahore, Pakistan',
   requiredDocs: [
