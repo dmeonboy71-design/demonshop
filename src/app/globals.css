@@ -723,13 +723,13 @@ body {
 
 .partner-logos-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
   gap: 6px;
 }
 
-@media (min-width: 580px) {
+@media (min-width: 680px) {
   .partner-logos-row {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(7, 1fr);
   }
 }
 

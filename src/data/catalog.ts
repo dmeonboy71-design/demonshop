@@ -812,6 +812,7 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     accountNumber: '01820980001234',
     accountTitle: 'INSTALMENT MOBILE LIMITED',
     code: 'AKBL',
+    logo: '/askari.png',
     type: 'bank' as const,
     featured: true
   },
@@ -858,6 +859,7 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     accountNumber: 'PWY-8849-2041-01',
     accountTitle: 'INSTALMENT MOBILE LIMITED',
     code: 'PAYWAY',
+    logo: '/payway.png',
     type: 'gateway' as const,
     featured: true
   },
@@ -869,15 +871,16 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     accountNumber: 'ABHI-INSTALMENT-IML',
     accountTitle: 'INSTALMENT MOBILE LIMITED',
     code: 'ABHI',
+    logo: '/abhi.png',
     type: 'financing' as const,
-    featured: false
+    featured: true
   }
 ];
 
 export const PAKISTAN_BANKS: BankOption[] = [
-  { id: 'askari', name: 'Askari Bank Limited', code: 'AKBL' },
+  { id: 'askari', name: 'Askari Bank Limited', code: 'AKBL', logo: '/askari.png' },
   { id: 'alfalah', name: 'Bank Alfalah Limited', code: 'BAL', logo: '/alflah.png' },
-  { id: 'raqami', name: 'Raqami Islamic Digital Bank Limited', code: 'RIDB' },
+  { id: 'raqami', name: 'Raqami Islamic Digital Bank Limited', code: 'RIDB', logo: '/raqami-logo-card.png' },
   { id: 'hbl', name: 'Habib Bank Limited (HBL)', code: 'HBL' },
   { id: 'ubl', name: 'United Bank Limited (UBL)', code: 'UBL' },
   { id: 'mcb', name: 'MCB Bank Limited (MCB)', code: 'MCB' },
@@ -912,7 +915,17 @@ export const MOBILE_WALLETS: WalletOption[] = [
     tagline: 'Instant 1-Click Secure Payment',
     accountNumber: 'PWY-8849-2041-01',
     accountTitle: 'INSTALMENT MOBILE LIMITED',
-    fee: '0%'
+    fee: '0%',
+    logo: '/payway.png'
+  },
+  {
+    id: 'abhi',
+    name: 'ABHI Financing',
+    tagline: 'Instant Salary & EMI Approval Partner',
+    accountNumber: 'ABHI-INSTALMENT-IML',
+    accountTitle: 'INSTALMENT MOBILE LIMITED',
+    fee: '0%',
+    logo: '/abhi.png'
   },
   {
     id: 'alfalah_wallet',

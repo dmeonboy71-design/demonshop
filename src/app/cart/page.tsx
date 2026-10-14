@@ -361,20 +361,34 @@ export default function CartPage() {
                   SUPPORTED ADVANCE PAYMENT CHANNELS:
                 </span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {['Easypaisa', 'Askari Bank', 'Bank Alfalah', 'UPaisa', 'Raqami Islamic', 'Payway'].map((c) => (
+                  {[
+                    { name: 'Easypaisa', logo: '/easypaisa.webp' },
+                    { name: 'Askari Bank', logo: '/askari.png' },
+                    { name: 'Bank Alfalah', logo: '/alflah.png' },
+                    { name: 'UPaisa', logo: '/upaisa.png' },
+                    { name: 'Raqami', logo: '/raqami-logo-card.png' },
+                    { name: 'Payway', logo: '/payway.png' },
+                    { name: 'ABHI Financing', logo: '/abhi.png' }
+                  ].map((c) => (
                     <span 
-                      key={c}
+                      key={c.name}
                       style={{
                         fontSize: 9,
                         fontWeight: 700,
                         color: '#cbd5e1',
-                        background: 'rgba(255,255,255,0.05)',
+                        background: 'rgba(255,255,255,0.06)',
                         border: '1px solid rgba(255,255,255,0.12)',
-                        padding: '3px 8px',
-                        borderRadius: 8
+                        padding: '3px 7px',
+                        borderRadius: 8,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5
                       }}
                     >
-                      {c}
+                      <span style={{ background: '#ffffff', borderRadius: 4, padding: '1px 4px', display: 'inline-flex', alignItems: 'center' }}>
+                        <img src={c.logo} alt={c.name} style={{ height: 11, width: 'auto', objectFit: 'contain' }} />
+                      </span>
+                      {c.name}
                     </span>
                   ))}
                 </div>

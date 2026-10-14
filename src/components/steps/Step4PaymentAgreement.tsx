@@ -178,12 +178,12 @@ export const Step4PaymentAgreement: React.FC = () => {
         </div>
       </div>
 
-      {/* 6 Supported Payment Channels (User Specified) */}
+      {/* Supported Payment Channels (Easypaisa, Askari Bank, Bank Alfalah, UPaisa, Raqami, Payway, ABHI) */}
       <div>
         <label className="form-label-dark">
           Select Supported Payment Method
         </label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(105px, 1fr))', gap: '10px' }}>
           {SUPPORTED_PAYMENT_CHANNELS.map((chan) => {
             const isSelected = selectedChannel === chan.id;
             return (
@@ -224,13 +224,27 @@ export const Step4PaymentAgreement: React.FC = () => {
                   </span>
                 )}
                 {chan.logo ? (
-                  <img
-                    src={chan.logo}
-                    alt={chan.name}
-                    style={{ height: 24, width: 'auto', objectFit: 'contain', marginBottom: 4 }}
-                  />
+                  <div style={{
+                    background: '#ffffff',
+                    borderRadius: '8px',
+                    padding: '3px 6px',
+                    height: 28,
+                    width: '100%',
+                    maxWidth: 100,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 6,
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
+                  }}>
+                    <img
+                      src={chan.logo}
+                      alt={chan.name}
+                      style={{ maxHeight: 22, maxWidth: '100%', objectFit: 'contain' }}
+                    />
+                  </div>
                 ) : (
-                  <div style={{ height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
                     <Landmark size={20} color="var(--gold-light)" />
                   </div>
                 )}
@@ -256,10 +270,29 @@ export const Step4PaymentAgreement: React.FC = () => {
         flexDirection: 'column',
         gap: '12px'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h4 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--gold-light)', textTransform: 'uppercase' }}>
-            Official Transfer Details: {activeChannelConfig.name}
-          </h4>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {activeChannelConfig.logo && (
+              <div style={{
+                background: '#ffffff',
+                borderRadius: '6px',
+                padding: '2px 6px',
+                height: 24,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <img
+                  src={activeChannelConfig.logo}
+                  alt={activeChannelConfig.name}
+                  style={{ maxHeight: 18, maxWidth: '70px', objectFit: 'contain' }}
+                />
+              </div>
+            )}
+            <h4 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--gold-light)', textTransform: 'uppercase' }}>
+              Official Transfer Details: {activeChannelConfig.name}
+            </h4>
+          </div>
           <span style={{ fontSize: '10px', color: '#10b981', fontWeight: 700 }}>
             ● Verified Merchant
           </span>

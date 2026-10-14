@@ -250,64 +250,75 @@ export const Step0Landing: React.FC = () => {
               <p>Multiple Payment Options for Your Convenience</p>
             </div>
 
-            {/* 5 Bank / Wallet Partner Cards in a row */}
+            {/* 7 Bank / Wallet / Financing Partner Cards in a row */}
             <div className="partner-logos-row">
               {/* 1. Easypaisa */}
               <div className="partner-logo-pill">
-                <div className="logo-badge-icon" style={{ color: '#00a651' }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <circle cx="12" cy="12" r="10" fill="#e6f7ed" />
-                    <circle cx="12" cy="12" r="6" fill="#00a651" />
-                    <circle cx="12" cy="12" r="2" fill="#ffffff" />
-                  </svg>
-                </div>
-                <strong className="partner-brand-name">easypaisa</strong>
+                <img 
+                  src="/easypaisa.webp" 
+                  alt="Easypaisa" 
+                  style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '2px' }} 
+                />
                 <span className="partner-brand-slogan">Khushiyon Bhara Aghez</span>
               </div>
 
               {/* 2. UPaisa */}
               <div className="partner-logo-pill">
-                <div className="logo-badge-icon">
-                  <span style={{ fontSize: '13px', fontWeight: 900, color: '#f37021' }}>u</span>
-                  <span style={{ fontSize: '11px', fontWeight: 900, color: '#0083ca' }}>paisa</span>
-                </div>
+                <img 
+                  src="/upaisa.png" 
+                  alt="UPaisa" 
+                  style={{ height: '22px', width: 'auto', objectFit: 'contain', marginBottom: '2px' }} 
+                />
                 <span className="partner-brand-slogan">Digital Payments</span>
               </div>
 
               {/* 3. Bank Alfalah */}
               <div className="partner-logo-pill">
-                <div className="logo-badge-icon">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="#d31820">
-                    <polygon points="12,2 22,20 2,20" />
-                  </svg>
-                </div>
-                <strong className="partner-brand-name" style={{ color: '#1e293b' }}>Bank Alfalah</strong>
+                <img 
+                  src="/alflah.png" 
+                  alt="Bank Alfalah" 
+                  style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '2px' }} 
+                />
                 <span className="partner-brand-slogan" style={{ color: '#d31820' }}>The Way Forward</span>
               </div>
 
               {/* 4. Askari Bank */}
               <div className="partner-logo-pill">
-                <div className="logo-badge-icon">
-                  <span style={{ fontSize: '11px', fontWeight: 900, color: '#0284c7' }}>askari</span>
-                </div>
+                <img 
+                  src="/askari.png" 
+                  alt="Askari Bank" 
+                  style={{ height: '26px', width: 'auto', objectFit: 'contain', marginBottom: '2px' }} 
+                />
                 <span className="partner-brand-slogan">Askari Bank</span>
               </div>
 
-              {/* 5. ZINDIGI / Payway */}
+              {/* 5. Payway Pakistan */}
               <div className="partner-logo-pill">
-                <div className="logo-badge-icon">
-                  <span style={{ fontSize: '11px', fontWeight: 900, color: '#0d9488' }}>ZINDIGI</span>
-                </div>
-                <span className="partner-brand-slogan">By JS Bank</span>
+                <img 
+                  src="/payway.png" 
+                  alt="Payway Pakistan" 
+                  style={{ height: '20px', width: 'auto', objectFit: 'contain', marginBottom: '2px' }} 
+                />
+                <span className="partner-brand-slogan">Payway Pakistan</span>
               </div>
 
-              {/* 6. Raqami Islamic Digital Bank (Beside Zindigi) */}
+              {/* 6. Raqami Islamic Digital Bank */}
               <div className="partner-logo-pill partner-logo-raqami">
                 <img 
                   src="/raqami-logo-card.png" 
                   alt="Raqami Islamic Digital Bank" 
                   className="raqami-pill-logo-img" 
                 />
+              </div>
+
+              {/* 7. ABHI Financing */}
+              <div className="partner-logo-pill">
+                <img 
+                  src="/abhi.png" 
+                  alt="ABHI Financing" 
+                  style={{ height: '22px', width: 'auto', objectFit: 'contain', marginBottom: '2px' }} 
+                />
+                <span className="partner-brand-slogan">Salary &amp; EMI</span>
               </div>
             </div>
           </div>

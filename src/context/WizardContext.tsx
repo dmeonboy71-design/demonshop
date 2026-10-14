@@ -13,7 +13,7 @@ import {
 } from '../data/catalog';
 
 export type DeliveryType = 'open_parcel' | 'standard';
-export type PaymentMethodChoice = 'easypaisa' | 'askari' | 'alfalah' | 'upaisa' | 'raqami' | 'payway' | 'card';
+export type PaymentMethodChoice = 'easypaisa' | 'askari' | 'alfalah' | 'upaisa' | 'raqami' | 'payway' | 'abhi' | 'card';
 
 export interface CustomerDetails {
   fullName: string;
