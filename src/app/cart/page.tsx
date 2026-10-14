@@ -365,10 +365,10 @@ export default function CartPage() {
                     { name: 'Easypaisa', logo: '/easypaisa.webp' },
                     { name: 'Askari Bank', logo: '/askari.png' },
                     { name: 'Bank Alfalah', logo: '/alflah.png' },
-                    { name: 'UPaisa', logo: '/upaisa.png' },
+                    { name: 'UPaisa', logo: '/upaisa-light.png' },
                     { name: 'Raqami', logo: '/raqami-logo-card.png' },
                     { name: 'Payway', logo: '/payway.png' },
-                    { name: 'ABHI Financing', logo: '/abhi.png' }
+                    { name: 'ABHI Financing', logo: '/abhi-light.png' }
                   ].map((c) => (
                     <span 
                       key={c.name}

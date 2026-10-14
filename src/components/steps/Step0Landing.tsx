@@ -265,7 +265,7 @@ export const Step0Landing: React.FC = () => {
               {/* 2. UPaisa */}
               <div className="partner-logo-pill">
                 <img 
-                  src="/upaisa.png" 
+                  src="/upaisa-light.png" 
                   alt="UPaisa" 
                   style={{ height: '22px', width: 'auto', objectFit: 'contain', marginBottom: '2px' }} 
                 />
@@ -314,7 +314,7 @@ export const Step0Landing: React.FC = () => {
               {/* 7. ABHI Financing */}
               <div className="partner-logo-pill">
                 <img 
-                  src="/abhi.png" 
+                  src="/abhi-light.png" 
                   alt="ABHI Financing" 
                   style={{ height: '22px', width: 'auto', objectFit: 'contain', marginBottom: '2px' }} 
                 />
