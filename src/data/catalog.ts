@@ -795,11 +795,11 @@ export const EMI_TENURES = [
 export const SUPPORTED_PAYMENT_CHANNELS = [
   {
     id: 'easypaisa',
-    name: 'Easypaisa',
+    name: 'EasyPaisa',
     category: 'Digital Wallet',
     tagline: 'Contact your agent for Payment verification',
     accountNumber: '03450951134',
-    accountTitle: 'INSTALMENT MOBILE LIMITED',
+    accountTitle: 'Company / Financing Partner / Company',
     logo: '/easypaisa.webp',
     type: 'wallet' as const,
     featured: true
@@ -810,7 +810,7 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     category: 'Commercial Bank',
     tagline: 'Reliable & Trusted Banking',
     accountNumber: '01820980001234',
-    accountTitle: 'INSTALMENT MOBILE LIMITED',
+    accountTitle: 'Company / Financing Partner / Company',
     code: 'AKBL',
     logo: '/askari.png',
     type: 'bank' as const,
@@ -822,7 +822,7 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     category: 'Premier Bank',
     tagline: 'The Way Forward',
     accountNumber: '55015001234567',
-    accountTitle: 'INSTALMENT MOBILE LIMITED',
+    accountTitle: 'Company / Financing Partner / Company',
     code: 'BAL',
     logo: '/alflah.png',
     type: 'bank' as const,
@@ -834,7 +834,7 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     category: 'Microfinance Wallet',
     tagline: 'Digital Payments for a Better Tomorrow',
     accountNumber: '03013136354',
-    accountTitle: 'INSTALMENT MOBILE LIMITED',
+    accountTitle: 'Company / Financing Partner / Company',
     logo: '/upaisa.png',
     type: 'wallet' as const,
     featured: true
@@ -845,9 +845,9 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     category: 'Islamic Digital Bank',
     tagline: 'Shariah Compliant • Digital Banking',
     accountNumber: '78601004567890',
-    accountTitle: 'INSTALMENT MOBILE LIMITED',
+    accountTitle: 'Company / Financing Partner / Company',
     code: 'RIDB',
-    logo: '/raqami-logo-card.png',
+    logo: '/raqami-clean.png',
     type: 'bank' as const,
     featured: true
   },
@@ -857,9 +857,9 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     category: 'Digital Payment Gateway',
     tagline: 'Fast, Secure Card & Bank Processing',
     accountNumber: 'PWY-8849-2041-01',
-    accountTitle: 'INSTALMENT MOBILE LIMITED',
+    accountTitle: 'Company / Financing Partner / Company',
     code: 'PAYWAY',
-    logo: '/payway.png',
+    logo: '/payway-icon.png',
     type: 'gateway' as const,
     featured: true
   },
@@ -869,10 +869,34 @@ export const SUPPORTED_PAYMENT_CHANNELS = [
     category: 'Financing Partner',
     tagline: 'Instant Salary & EMI Approval Partner',
     accountNumber: 'ABHI-INSTALMENT-IML',
-    accountTitle: 'INSTALMENT MOBILE LIMITED',
+    accountTitle: 'Company / Financing Partner / Company',
     code: 'ABHI',
     logo: '/abhi.png',
     type: 'financing' as const,
+    featured: true
+  },
+  {
+    id: 'zindigi',
+    name: 'Zindigi',
+    category: 'Digital Bank',
+    tagline: 'Powered by JS Bank',
+    accountNumber: '03450951134',
+    accountTitle: 'Company / Financing Partner / Company',
+    code: 'ZINDIGI',
+    logo: '/zindigi.png',
+    type: 'bank' as const,
+    featured: true
+  },
+  {
+    id: 'other_bank',
+    name: 'Other Bank',
+    category: 'Bank Account',
+    tagline: 'All Pakistan Scheduled Banks',
+    accountNumber: '01820980001234',
+    accountTitle: 'Company / Financing Partner / Company',
+    code: 'OTHER',
+    badge: '9',
+    type: 'bank' as const,
     featured: true
   }
 ];
