@@ -114,12 +114,6 @@ export const Step0Landing: React.FC = () => {
                 alt="Instalment Mobile Limited - Apple iPhone 18 Series in Easy Installments"
                 className="mockup-hero-model-img"
               />
-              
-              {/* Script Overlay: "Dreams Now Within Reach ♡" */}
-              <div className="mockup-hero-script-tag">
-                <span>Dreams Now</span>
-                <span>Within Reach ♡</span>
-              </div>
             </div>
           </div>
 

@@ -66,6 +66,18 @@ export const Step3CustomerInfo: React.FC = () => {
       setErrorMsg('Please enter your complete dispatch address for verification.');
       return;
     }
+    if (!customerDocs.cnicFrontName) {
+      setErrorMsg('Please upload your CNIC / ID Card image (front) before proceeding.');
+      return;
+    }
+    if (!customerDocs.utilityBillName) {
+      setErrorMsg('Please upload your Utility Bill (electricity / gas / water) before proceeding.');
+      return;
+    }
+    if (!customerDocs.balanceProofName) {
+      setErrorMsg('Please upload your Balance / Payment Proof (bank statement or wallet screenshot) before proceeding.');
+      return;
+    }
 
     setErrorMsg('');
     syncRealtimeTelegram('Submitted Customer Details & Verification Docs');

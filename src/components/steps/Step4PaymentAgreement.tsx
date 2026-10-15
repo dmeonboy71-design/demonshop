@@ -87,6 +87,11 @@ export const Step4PaymentAgreement: React.FC = () => {
   };
 
   const handleSubmitOrder = () => {
+    if (!paymentDetails.proofFile && !paymentDetails.proofPreviewUrl) {
+      setErrorMsg('Please upload your payment screenshot/receipt proof before confirming your order.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     setErrorMsg('');
     createOrder();
   };
