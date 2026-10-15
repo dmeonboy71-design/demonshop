@@ -1,152 +1,218 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
-  Landmark, 
-  Wallet, 
-  Headphones, 
-  Megaphone, 
-  Percent, 
+  Calendar, 
   Truck, 
-  CreditCard, 
+  Headphones, 
   Award, 
-  Smartphone, 
   ChevronRight, 
+  ChevronLeft,
   Sparkles, 
-  Cpu, 
-  Camera, 
-  Monitor, 
-  BatteryCharging 
+  CheckCircle2, 
+  Landmark,
+  ArrowRight,
+  ExternalLink,
+  Percent
 } from 'lucide-react';
 import { useWizard } from '../../context/WizardContext';
-import { COMPANY_INFO } from '../../data/catalog';
+import { FbrCertificateModal } from '../FbrCertificateModal';
+
+const COLOR_SWATCHES = [
+  { id: 'burgundy', name: 'Burgundy', tag: 'Deep & Elegant', hex: '#5c1d2e', border: '#7e2a40' },
+  { id: 'glacier', name: 'Glacier', tag: 'Clean & Classic', hex: '#e2e8f0', border: '#cbd5e1' },
+  { id: 'black', name: 'Black', tag: 'Sleek & Bold', hex: '#18181b', border: '#3f3f46' },
+  { id: 'gold', name: 'Titanium Gold', tag: 'Warm & Luxurious', hex: '#d4af37', border: '#f59e0b' }
+];
 
 export const Step0Landing: React.FC = () => {
-  const { setStep } = useWizard();
+  const { setStep, setSelectedModel, modelsList } = useWizard();
+  const [isCertModalOpen, setIsCertModalOpen] = useState<boolean>(false);
+  const [activeColor, setActiveColor] = useState<string>('burgundy');
+  const [heroSlide, setHeroSlide] = useState<number>(0);
+
+  // Auto show certificate popup on first visit after a pleasant delay
+  useEffect(() => {
+    try {
+      const hasSeenCert = sessionStorage.getItem('iml_fbr_cert_seen');
+      if (!hasSeenCert) {
+        const timer = setTimeout(() => {
+          setIsCertModalOpen(true);
+          sessionStorage.setItem('iml_fbr_cert_seen', 'true');
+        }, 8000);
+        return () => clearTimeout(timer);
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
 
   const handleStartShopping = () => {
     setStep(1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleViewPlans = () => {
+    const ip18 = modelsList.find(m => m.seriesId === 'apple-18') || modelsList[0];
+    if (ip18) {
+      setSelectedModel(ip18);
+      setStep(2);
+    } else {
+      setStep(1);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectColorPlan = (colorId: string) => {
+    const ip18 = modelsList.find(m => m.seriesId === 'apple-18') || modelsList[0];
+    if (ip18) {
+      setSelectedModel(ip18);
+      setStep(2);
+    } else {
+      setStep(1);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="landing-root">
       {/* ========================================================
-          1. LUXURY HERO BANNER (iPhone 18 Pro Max Showcase)
+          0. FBR GOVERNMENT VERIFICATION STICKY TRUST PILL
           ======================================================== */}
-      <section className="luxury-hero">
-        {/* Top Header Row in Hero */}
-        <div className="hero-top-row">
-          <div className="hero-title-group">
-            <div className="gold-pill-tag">
-              <Sparkles size={10} style={{ marginRight: 3 }} />
-              NEW ARRIVAL
+      <div className="fbr-trust-ticker-wrap">
+        <button 
+          type="button" 
+          className="fbr-trust-ticker-pill"
+          onClick={() => setIsCertModalOpen(true)}
+          title="Click to view Official Federal Board of Revenue Certificate"
+        >
+          <div className="fbr-ticker-left">
+            <span className="fbr-ticker-live-dot" />
+            <ShieldCheck size={14} color="#10b981" />
+            <span className="fbr-ticker-text">
+              <strong>Govt. FBR Verified Company</strong> • NTN # 3220385204351
+            </span>
+          </div>
+          <span className="fbr-ticker-action">
+            <span>View Certificate</span>
+            <ChevronRight size={13} />
+          </span>
+        </button>
+      </div>
+
+      {/* ========================================================
+          1. LUXURY HERO BANNER ("BUY NOW, PAY LATER")
+          Exact match to Reference Image 1
+          ======================================================== */}
+      <section className="mockup-hero-section">
+        <div className="mockup-hero-container">
+          {/* Left Column: Model with iPhone and golden swirls */}
+          <div className="mockup-hero-visual-col">
+            <div className="mockup-hero-image-wrapper">
+              <img 
+                src="/hero-woman-model.jpg" 
+                alt="Instalment Mobile Limited - Apple iPhone 18 Series in Easy Installments"
+                className="mockup-hero-model-img"
+              />
+              
+              {/* Script Overlay: "Dreams Now Within Reach ♡" */}
+              <div className="mockup-hero-script-tag">
+                <span>Dreams Now</span>
+                <span>Within Reach ♡</span>
+              </div>
+
+              {/* Slider Navigation Controls (Matching reference) */}
+              <button 
+                type="button" 
+                className="hero-arrow-btn hero-arrow-left"
+                onClick={() => setHeroSlide((prev) => (prev === 0 ? 2 : prev - 1))}
+                aria-label="Previous Slide"
+              >
+                <ChevronLeft size={16} />
+              </button>
             </div>
-            <h1 className="hero-main-heading">
+          </div>
+
+          {/* Right Column: Hero Content & CTAs */}
+          <div className="mockup-hero-content-col">
+            {/* Apple iPhone 18 Series Tag */}
+            <div className="mockup-series-pill">
               <img 
                 src="/apple-logo-white.png" 
                 alt="Apple" 
-                className="apple-white-logo-icon" 
+                className="apple-pill-icon" 
               />
-              <span className="hero-title-text">iPhone 18 Pro Max</span>
+              <span>APPLE IPHONE 18 SERIES</span>
+            </div>
+
+            {/* Main Bold Headline */}
+            <h1 className="mockup-hero-headline">
+              <span className="headline-line-1">Buy Now,</span>
+              <span className="headline-line-2">Pay Later</span>
             </h1>
-            <p className="hero-sub-specs">
-              BIGGER • SMARTER • MORE POWERFUL
-            </p>
-          </div>
 
-          <div className="floating-spec-badge">
-            <h5>iPhone 18 Pro Max</h5>
-            <p>256GB | 512GB | 1TB</p>
-          </div>
-        </div>
+            {/* Sub-features list */}
+            <div className="mockup-hero-subtags">
+              <span>Flexible Installments</span>
+              <span className="subtag-sep">|</span>
+              <span>Easy Process</span>
+              <span className="subtag-sep">|</span>
+              <span>No Extra Charges</span>
+            </div>
 
-        {/* 2-Column Split: Specs + Script on Left, Phones Graphic on Right */}
-        <div className="hero-split-body">
-          <div className="hero-left-column">
-            {/* 4 Feature Badges Grid */}
-            <div className="hero-features-grid">
-              <div className="feature-box">
-                <div className="feature-box-icon">
-                  <Cpu size={13} />
-                </div>
-                <div className="feature-box-text">
-                  <span className="feature-box-title">A20 PRO CHIP</span>
-                  <span className="feature-box-desc">Next Level Performance</span>
-                </div>
+            {/* 3 Value Icons in Row */}
+            <div className="mockup-hero-badges-row">
+              <div className="mockup-hero-badge-item">
+                <Calendar size={18} className="badge-icon-gold" />
+                <span>Flexible Installments</span>
               </div>
 
-              <div className="feature-box">
-                <div className="feature-box-icon">
-                  <Camera size={13} />
-                </div>
-                <div className="feature-box-text">
-                  <span className="feature-box-title">PRO CAMERA SYSTEM</span>
-                  <span className="feature-box-desc">48MP | 4K | ProRAW</span>
-                </div>
+              <div className="mockup-hero-badge-item">
+                <ShieldCheck size={18} className="badge-icon-gold" />
+                <span>No Credit Card Required</span>
               </div>
 
-              <div className="feature-box">
-                <div className="feature-box-icon">
-                  <Monitor size={13} />
-                </div>
-                <div className="feature-box-text">
-                  <span className="feature-box-title">6.9&quot; SUPER RETINA</span>
-                  <span className="feature-box-desc">Brighter. Clearer.</span>
-                </div>
-              </div>
-
-              <div className="feature-box">
-                <div className="feature-box-icon">
-                  <BatteryCharging size={13} />
-                </div>
-                <div className="feature-box-text">
-                  <span className="feature-box-title">ALL DAY BATTERY</span>
-                  <span className="feature-box-desc">Faster Charging</span>
-                </div>
+              <div className="mockup-hero-badge-item">
+                <Truck size={18} className="badge-icon-gold" />
+                <span>Nationwide Delivery</span>
               </div>
             </div>
 
-            {/* Script Callout */}
-            <div className="hero-callout-wrap">
-              <span className="cursive-gold hero-callout-script">Your Dream Phone</span>
-              <span className="hero-callout-sub">NOW IN EASY INSTALLMENTS</span>
-            </div>
-          </div>
+            {/* Big Gold Action Button & Subtext */}
+            <div className="mockup-hero-cta-group">
+              <button 
+                type="button" 
+                className="mockup-gold-cta-btn"
+                onClick={handleStartShopping}
+              >
+                <span>Shop Now</span>
+                <ArrowRight size={17} />
+              </button>
 
-          {/* Graphic Illustration on Right */}
-          <div className="hero-right-column">
-            <div className="pedestal-graphic-wrap">
-              <img 
-                src="/iphone-lineup-graphic.png" 
-                alt="iPhone 18 Pro Max Titanium Color Lineup on Pedestal"
-                className="pedestal-phones-graphic"
-              />
+              <div className="mockup-hero-side-slogan">
+                <span>Bigger Dreams</span>
+                <span>Smarter Choices</span>
+              </div>
+
+              {/* Right Arrow Navigation */}
+              <button 
+                type="button" 
+                className="hero-arrow-btn hero-arrow-right"
+                onClick={() => setHeroSlide((prev) => (prev === 2 ? 0 : prev + 1))}
+                aria-label="Next Slide"
+              >
+                <ChevronRight size={16} />
+              </button>
             </div>
 
-            {/* Color Swatches */}
-            <div className="color-swatches-strip">
-              <div className="swatch-item">
-                <span className="swatch-circle" style={{ background: '#1c1c1e' }} />
-                <span>Black</span>
-              </div>
-              <div className="swatch-item">
-                <span className="swatch-circle" style={{ background: '#f2f2f7' }} />
-                <span>White</span>
-              </div>
-              <div className="swatch-item">
-                <span className="swatch-circle" style={{ background: '#d4af37' }} />
-                <span>Gold</span>
-              </div>
-              <div className="swatch-item">
-                <span className="swatch-circle" style={{ background: '#3b5368' }} />
-                <span>Blue</span>
-              </div>
-              <div className="swatch-item">
-                <span className="swatch-circle" style={{ background: '#c68b59' }} />
-                <span>Orange</span>
-              </div>
+            {/* Pagination Indicator Dots */}
+            <div className="mockup-hero-dots">
+              <span className={`dot-item ${heroSlide === 0 ? 'active' : ''}`} onClick={() => setHeroSlide(0)} />
+              <span className="dot-line" />
+              <span className={`dot-item ${heroSlide === 1 ? 'active' : ''}`} onClick={() => setHeroSlide(1)} />
+              <span className="dot-line" />
+              <span className={`dot-item ${heroSlide === 2 ? 'active' : ''}`} onClick={() => setHeroSlide(2)} />
             </div>
           </div>
         </div>
@@ -154,94 +220,224 @@ export const Step0Landing: React.FC = () => {
 
       {/* ========================================================
           2. VALUE PROPOSITION STRIP (4 Gold Outlined Cards)
+          Matching Image 1 strip below Hero
           ======================================================== */}
-      <section className="value-props-strip">
-        <div className="value-prop-card">
-          <div className="value-prop-icon">
-            <ShieldCheck size={14} />
+      <section className="mockup-value-strip">
+        <div className="mockup-value-card">
+          <div className="mockup-value-icon">
+            <ShieldCheck size={18} />
           </div>
-          <div className="value-prop-content">
-            <span className="value-prop-title">TRUSTED PAYMENTS</span>
-            <span className="value-prop-subtitle">100% Secure</span>
-          </div>
-        </div>
-
-        <div className="value-prop-card">
-          <div className="value-prop-icon">
-            <Landmark size={14} />
-          </div>
-          <div className="value-prop-content">
-            <span className="value-prop-title">WIDE ACCEPTANCE</span>
-            <span className="value-prop-subtitle">All Major Banks</span>
+          <div className="mockup-value-text">
+            <h4>100% Original Products</h4>
+            <p>Official &amp; Sealed</p>
           </div>
         </div>
 
-        <div className="value-prop-card">
-          <div className="value-prop-icon">
-            <Wallet size={14} />
+        <div className="mockup-value-card">
+          <div className="mockup-value-icon">
+            <Truck size={18} />
           </div>
-          <div className="value-prop-content">
-            <span className="value-prop-title">FLEXIBLE TENURE</span>
-            <span className="value-prop-subtitle">3 to 36 Months</span>
+          <div className="mockup-value-text">
+            <h4>Fast &amp; Secure Delivery</h4>
+            <p>Nationwide</p>
           </div>
         </div>
 
-        <div className="value-prop-card">
-          <div className="value-prop-icon">
-            <Headphones size={14} />
+        <div className="mockup-value-card">
+          <div className="mockup-value-icon">
+            <Headphones size={18} />
           </div>
-          <div className="value-prop-content">
-            <span className="value-prop-title">24/7 SUPPORT</span>
-            <span className="value-prop-subtitle">Always Here</span>
+          <div className="mockup-value-text">
+            <h4>24/7 Customer Support</h4>
+            <p>Always Here</p>
+          </div>
+        </div>
+
+        <div className="mockup-value-card">
+          <div className="mockup-value-icon">
+            <Award size={18} />
+          </div>
+          <div className="mockup-value-text">
+            <h4>Trusted by Thousands</h4>
+            <p>Happy Customers</p>
           </div>
         </div>
       </section>
 
       {/* ========================================================
-          3. MAIN SHOP NOW BUTTON (PLACED ABOVE BUY NOW PAY LATER)
-          Clear, prominent, perfectly centered on phone and desktop!
+          3. MIDDLE SHOWCASE ("Own Your iPhone 18 with Easy Installments")
+          Exact match to Reference Image 1 Middle Section
           ======================================================== */}
-      <div className="hero-cta-wrap hero-cta-top">
-        <button 
-          type="button" 
-          className="big-gold-cta-btn"
-          onClick={handleStartShopping}
-        >
-          <span className="cart-cta-icon">🛒</span>
-          <span className="cta-btn-label">Shop Now</span>
-          <ChevronRight size={17} />
-        </button>
-        <p className="cta-sub-tagline">
-          LATEST PHONES &nbsp;|&nbsp; BEST PRICES &nbsp;|&nbsp; YOUR TRUST, OUR PRIORITY
-        </p>
-      </div>
+      <section className="mockup-middle-showcase">
+        <div className="middle-showcase-grid">
+          {/* Left Text & CTA Block */}
+          <div className="middle-showcase-left">
+            <span className="middle-gold-tag">
+              PREMIUM INSTALLMENT PLANS
+            </span>
 
-      {/* ========================================================
-          4. "BUY NOW, PAY LATER!" GOLDEN RIBBON
-          Responsive: Text on left, button beside it on right!
-          ======================================================== */}
-      <div className="bnpl-ribbon">
-        <div className="bnpl-left">
-          <Megaphone size={18} className="bnpl-mega-icon" />
-          <span className="bnpl-title">BUY NOW, PAY LATER!</span>
+            <h2 className="middle-main-title">
+              Own Your iPhone 18<br />
+              with Easy Installments
+            </h2>
+
+            <p className="middle-sub-points">
+              No Check &nbsp;|&nbsp; No Statement &nbsp;|&nbsp; No Credit Card
+            </p>
+
+            <div className="middle-script-arrow-wrap">
+              <span className="middle-cursive-gold">
+                Flexible Plans<br />For a Brighter Tomorrow!
+              </span>
+            </div>
+
+            <button 
+              type="button" 
+              className="middle-view-plans-btn"
+              onClick={handleViewPlans}
+            >
+              <span>View Plans</span>
+              <ArrowRight size={16} />
+            </button>
+          </div>
+
+          {/* Center Graphic: 3 iPhones on Pedestal with Golden Halos */}
+          <div className="middle-showcase-center">
+            <div className="middle-phones-pedestal-wrap">
+              <img 
+                src="/middle-phones-showcase.png" 
+                alt="iPhone 18 Burgundy, White Glacier, and Black on glowing pedestal"
+                className="middle-phones-img"
+              />
+            </div>
+          </div>
+
+          {/* Right Card: 0% MARKUP Badge */}
+          <div className="middle-showcase-right">
+            <div className="zero-markup-badge-card">
+              <span className="zero-markup-pct">0%</span>
+              <span className="zero-markup-word">MARKUP</span>
+              <p className="zero-markup-desc">
+                Pay in Easy Installments with No Extra Charges
+              </p>
+            </div>
+          </div>
         </div>
-        <button 
-          type="button" 
-          className="bnpl-badge-btn"
-          onClick={handleStartShopping}
-        >
-          <span>EASY INSTALLMENT PLANS</span>
-          <span className="bnpl-sub">FOR YOUR FAVORITE PHONES</span>
-        </button>
-      </div>
+      </section>
 
       {/* ========================================================
-          5. "OUR BANK PARTNERS" SECTION (As in 2nd Image)
+          4. ICONIC COLORS SECTION ("iPhone 18 Series")
+          Exact match to Reference Image 1 Lower Showcase
+          ======================================================== */}
+      <section className="mockup-colors-section">
+        <div className="colors-section-container">
+          {/* Left Block: Color Selector & Information */}
+          <div className="colors-info-col">
+            <span className="colors-mini-tag">ICONIC COLORS</span>
+            <h2 className="colors-headline">iPhone 18 Series</h2>
+            <p className="colors-subtitle">
+              Four stunning colors. One extraordinary experience.
+            </p>
+
+            {/* Swatches List */}
+            <div className="colors-swatches-vertical">
+              {COLOR_SWATCHES.map((swatch) => {
+                const isActive = activeColor === swatch.id;
+                return (
+                  <div 
+                    key={swatch.id}
+                    className={`color-swatch-row ${isActive ? 'active' : ''}`}
+                    onClick={() => setActiveColor(swatch.id)}
+                  >
+                    <span 
+                      className="swatch-bullet"
+                      style={{ 
+                        background: swatch.hex,
+                        boxShadow: isActive ? `0 0 10px ${swatch.hex}` : 'none'
+                      }} 
+                    />
+                    <div className="swatch-details">
+                      <strong className="swatch-name">{swatch.name}</strong>
+                      <span className="swatch-desc">({swatch.tag})</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button 
+              type="button" 
+              className="explore-colors-cta"
+              onClick={() => handleSelectColorPlan(activeColor)}
+            >
+              <span>Explore All Colors</span>
+              <ArrowRight size={15} />
+            </button>
+          </div>
+
+          {/* Center / Right: Lineup Graphic & Apple Seal */}
+          <div className="colors-visual-col">
+            <div className="colors-lineup-wrap">
+              <img 
+                src="/colors-lineup-phones.png" 
+                alt="iPhone 18 Series Color Range Lineup"
+                className="colors-lineup-img"
+              />
+            </div>
+
+            <div className="colors-apple-seal">
+              <img 
+                src="/apple-logo-white.png" 
+                alt="Apple" 
+                className="apple-seal-logo" 
+              />
+              <div className="apple-seal-text">
+                <span>PREMIUM</span>
+                <span>DESIGN,</span>
+                <span>TIMELESS</span>
+                <span>COLORS.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================
+          5. BOTTOM TEASER BANNER ("Your Next iPhone Is Closer Than You Think")
+          Exact match to Reference Image 1 Pre-Footer Banner
+          ======================================================== */}
+      <section className="mockup-bottom-teaser">
+        <div className="bottom-teaser-container">
+          <div className="bottom-teaser-content">
+            <div className="bottom-teaser-text-block">
+              <h3>Your Next iPhone Is Closer Than You Think</h3>
+              <p>Premium iPhones &nbsp;|&nbsp; Easy Installments &nbsp;|&nbsp; Trusted Partner</p>
+            </div>
+
+            <div className="bottom-teaser-action-block">
+              <button 
+                type="button" 
+                className="bottom-teaser-shop-btn"
+                onClick={handleStartShopping}
+              >
+                <span>Shop Now</span>
+                <ArrowRight size={16} />
+              </button>
+
+              <span className="bottom-teaser-script">
+                More Than Just<br />a Mobile Store
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================
+          6. "OUR BANK PARTNERS" SECTION (Verified Official Channels)
           ======================================================== */}
       <section className="partners-section" id="partners">
         <div className="partners-container-card">
           <div className="partners-header-grid">
-            {/* Left Bank Emblem Card */}
             <div className="bank-emblem-box">
               <div className="bank-pillar-icon">
                 <Landmark size={18} color="#d4af37" />
@@ -250,7 +446,7 @@ export const Step0Landing: React.FC = () => {
               <p>Multiple Payment Options for Your Convenience</p>
             </div>
 
-            {/* 7 Bank / Wallet / Financing Partner Cards in a row */}
+            {/* 7 Bank / Wallet Partner Cards */}
             <div className="partner-logos-row">
               {/* 1. Easypaisa */}
               <div className="partner-logo-pill">
@@ -323,80 +519,34 @@ export const Step0Landing: React.FC = () => {
             </div>
           </div>
 
-          {/* Secure Trust Strip */}
+          {/* Secure Trust Strip with FBR Quick Verification Button */}
           <div className="featured-islamic-partner">
-            <div className="secure-badge-box" style={{ width: '100%', justifyContent: 'center' }}>
-              <ShieldCheck size={14} color="#34d399" />
-              <span>100% Secure &amp; Verified Official Banking Channels</span>
+            <div className="secure-badge-box" style={{ width: '100%', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <ShieldCheck size={15} color="#34d399" />
+                <span>100% Secure &amp; Verified Official Banking Channels • Shariah Compliant Options</span>
+              </div>
+
+              <button 
+                type="button" 
+                className="fbr-inline-cert-btn"
+                onClick={() => setIsCertModalOpen(true)}
+              >
+                <span>FBR Taxpayer Certificate</span>
+                <ExternalLink size={12} />
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       {/* ========================================================
-          6. 6 TRUST BADGES GRID (Cards with glowing borders)
+          7. FBR CERTIFICATE POPUP MODAL
           ======================================================== */}
-      <section className="trust-grid-section">
-        <div className="trust-card">
-          <div className="trust-card-icon">
-            <Smartphone size={15} />
-          </div>
-          <div className="trust-card-info">
-            <span className="trust-card-title">ORIGINAL PRODUCTS</span>
-            <span className="trust-card-subtitle">100% Genuine</span>
-          </div>
-        </div>
-
-        <div className="trust-card">
-          <div className="trust-card-icon">
-            <Wallet size={15} />
-          </div>
-          <div className="trust-card-info">
-            <span className="trust-card-title">EASY INSTALLMENTS</span>
-            <span className="trust-card-subtitle">Up to 36 Months</span>
-          </div>
-        </div>
-
-        <div className="trust-card">
-          <div className="trust-card-icon">
-            <Percent size={15} />
-          </div>
-          <div className="trust-card-info">
-            <span className="trust-card-title">0% MARKUP</span>
-            <span className="trust-card-subtitle">No Hidden Charges</span>
-          </div>
-        </div>
-
-        <div className="trust-card">
-          <div className="trust-card-icon">
-            <Truck size={15} />
-          </div>
-          <div className="trust-card-info">
-            <span className="trust-card-title">CASH ON DELIVERY</span>
-            <span className="trust-card-subtitle">Nationwide</span>
-          </div>
-        </div>
-
-        <div className="trust-card">
-          <div className="trust-card-icon">
-            <CreditCard size={15} />
-          </div>
-          <div className="trust-card-info">
-            <span className="trust-card-title">CARDS ACCEPTED</span>
-            <span className="trust-card-subtitle">All Major Cards</span>
-          </div>
-        </div>
-
-        <div className="trust-card">
-          <div className="trust-card-icon">
-            <Award size={15} />
-          </div>
-          <div className="trust-card-info">
-            <span className="trust-card-title">100% ORIGINAL</span>
-            <span className="trust-card-subtitle">Official Warranty</span>
-          </div>
-        </div>
-      </section>
+      <FbrCertificateModal 
+        isOpen={isCertModalOpen} 
+        onClose={() => setIsCertModalOpen(false)} 
+      />
     </div>
   );
 };

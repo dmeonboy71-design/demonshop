@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenLookup }) => {
           onClick={() => setStep(1)}
         >
           <Smartphone size={14} />
-          <span>Phones</span>
+          <span>Shop</span>
         </button>
 
         <button 
@@ -74,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenLookup }) => {
           }}
         >
           <Layers size={14} />
-          <span>Plans</span>
+          <span>Installment Plans</span>
         </button>
 
         <a 
@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenLookup }) => {
           }}
         >
           <Users size={14} />
-          <span>About</span>
+          <span>About Us</span>
         </a>
 
         <a 
@@ -105,11 +105,25 @@ export const Header: React.FC<HeaderProps> = ({ onOpenLookup }) => {
         </a>
       </nav>
 
+      {/* Desktop Search Input (Matching Image 1) */}
+      <div 
+        className="nav-desktop-search"
+        onClick={() => setStep(1)}
+        title="Search for your favorite iPhone"
+      >
+        <Search size={13} className="nav-search-icon" />
+        <input 
+          type="text" 
+          placeholder="Search for your favorite iPhone..." 
+          readOnly 
+        />
+      </div>
+
       {/* Right Actions: Search, Track (White Truck Icon), Cart */}
       <div className="nav-actions-right">
         <button 
           type="button" 
-          className="nav-icon-btn" 
+          className="nav-icon-btn nav-mobile-search-btn" 
           title="Search Phones"
           onClick={() => setStep(1)}
         >
