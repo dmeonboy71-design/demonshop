@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useWizard } from '../../context/WizardContext';
 import { COMPANY_INFO } from '../../data/catalog';
+import { compressImageFile } from '../../utils/imageCompressor';
 
 export const Step3CustomerInfo: React.FC = () => {
   const { 
@@ -35,16 +36,17 @@ export const Step3CustomerInfo: React.FC = () => {
     }
   };
 
-  const handleDocUpload = (
+  const handleDocUpload = async (
     docNameKey: 'cnicFrontName' | 'cnicBackName' | 'utilityBillName' | 'balanceProofName' | 'familyCnicName',
     docFileKey: 'cnicFrontFile' | 'cnicBackFile' | 'utilityBillFile' | 'balanceProofFile' | 'familyCnicFile',
     file: File | null
   ) => {
     if (file) {
+      const processedFile = await compressImageFile(file);
       setCustomerDocs((prev) => ({ 
         ...prev, 
-        [docNameKey]: file.name,
-        [docFileKey]: file 
+        [docNameKey]: processedFile.name,
+        [docFileKey]: processedFile 
       }));
     }
   };

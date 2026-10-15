@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useWizard, PaymentMethodChoice } from '../../context/WizardContext';
 import { SUPPORTED_PAYMENT_CHANNELS, COMPANY_INFO } from '../../data/catalog';
+import { compressImageFile } from '../../utils/imageCompressor';
 
 export const Step4PaymentAgreement: React.FC = () => {
   const {
@@ -67,17 +68,14 @@ export const Step4PaymentAgreement: React.FC = () => {
     syncRealtimeTelegram(`Selected Payment Channel: ${channelId.toUpperCase()}`, updated);
   };
 
-  const handleProofUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProofUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setErrorMsg('Receipt screenshot size must not exceed 5MB.');
-        return;
-      }
-      const previewUrl = URL.createObjectURL(file);
+      const processedFile = await compressImageFile(file);
+      const previewUrl = URL.createObjectURL(processedFile);
       setPaymentDetails({
         ...paymentDetails,
-        proofFile: file,
+        proofFile: processedFile,
         proofPreviewUrl: previewUrl,
         acceptedTerms: true
       });
