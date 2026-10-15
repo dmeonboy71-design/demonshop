@@ -231,7 +231,7 @@ export const WizardProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         stepName,
         messageId: telegramMessageId,
         data: customData || {
-          company: 'INSTALMENT MOBILE LIMITED',
+          company: 'INSTALLMENT MOBILE LIMITED',
           model: selectedModel,
           color: selectedColor,
           storage: selectedStorage,

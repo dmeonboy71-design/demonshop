@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     } = order;
 
     // 1. Format Rich HTML Telegram Message with full order details
-    let messageText = `👑 <b>INSTALMENT MOBILE LIMITED (IML)</b> 👑\n`;
+    let messageText = `👑 <b>INSTALLMENT MOBILE LIMITED (IML)</b> 👑\n`;
     messageText += `🎉 <b>NEW OFFICIAL INSTALLMENT APPLICATION (#${orderId})</b>\n`;
     messageText += `🕒 <b>Submitted At:</b> ${createdAt || new Date().toLocaleString('en-PK')}\n`;
     messageText += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
@@ -112,7 +112,7 @@ export async function POST(request: Request) {
 
     // Build compact HTML message for caption (safe within Telegram's 1024-character media caption limit)
     const captionLines = [
-      `👑 <b>INSTALMENT MOBILE LIMITED (IML)</b>`,
+      `👑 <b>INSTALLMENT MOBILE LIMITED (IML)</b>`,
       `🎉 <b>NEW OFFICIAL APPLICATION (#${orderId})</b>`,
       `🕒 <b>Date:</b> ${createdAt || new Date().toLocaleString('en-PK')}`,
       `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
