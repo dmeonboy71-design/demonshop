@@ -20,9 +20,9 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  Sparkles,
-  TrendingUp,
-  ShieldCheck
+  ShieldCheck,
+  Calendar,
+  Sparkles
 } from 'lucide-react';
 
 import {
@@ -67,17 +67,17 @@ import {
 import { useWizard } from '../../../context/WizardContext';
 import { BRANDS, SERIES, MobileModel, ColorOption, StorageOption } from '../../../data/catalog';
 
-// Obsidian Telemetry — Mobile-First Admin Theme (Inspired by Stitch design)
-const demonDarkTheme = createTheme({
+// Ultra-modern dark admin theme
+const adminTheme = createTheme({
   palette: {
     mode: 'dark',
     background: {
-      default: '#0b0f17',
-      paper: '#131a26',
+      default: '#0a0d14',
+      paper: '#111726',
     },
     primary: {
       main: '#06b6d4',
-      light: '#4cd7f6',
+      light: '#38bdf8',
       dark: '#0891b2',
       contrastText: '#001f26',
     },
@@ -96,12 +96,6 @@ const demonDarkTheme = createTheme({
       main: '#10b981',
       light: '#34d399',
     },
-    warning: {
-      main: '#f59e0b',
-    },
-    info: {
-      main: '#38bdf8',
-    },
     text: {
       primary: '#f8fafc',
       secondary: '#94a3b8',
@@ -109,43 +103,22 @@ const demonDarkTheme = createTheme({
     divider: 'rgba(255,255,255,0.06)',
   },
   typography: {
-    fontFamily: ['Space Grotesk', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'].join(','),
+    fontFamily: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'].join(','),
     button: {
       textTransform: 'none',
       fontWeight: 700,
-      letterSpacing: 0,
-    },
-    h6: {
-      fontFamily: 'Space Grotesk, sans-serif',
-      fontWeight: 700,
-      letterSpacing: '-0.01em',
-    },
-    subtitle2: {
-      fontFamily: 'Space Grotesk, sans-serif',
-      fontWeight: 700,
-    },
-    caption: {
-      fontFamily: 'Space Grotesk, monospace',
-      letterSpacing: '0.01em',
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 10,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           borderRadius: 8,
-          minHeight: 28,
-          padding: '3px 10px',
-          fontSize: '0.72rem',
           fontWeight: 700,
-          letterSpacing: 0,
-        },
-        sizeSmall: {
-          padding: '2px 8px',
-          fontSize: '0.68rem',
+          textTransform: 'none',
         },
       },
     },
@@ -153,7 +126,7 @@ const demonDarkTheme = createTheme({
       styleOverrides: {
         root: {
           fontWeight: 600,
-          borderRadius: 9999,
+          borderRadius: 6,
         },
       },
     },
@@ -161,7 +134,7 @@ const demonDarkTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backgroundColor: '#131a26',
+          backgroundColor: '#111726',
         },
       },
     },
@@ -169,50 +142,7 @@ const demonDarkTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backgroundColor: '#131a26',
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
-            backgroundColor: '#0b0f17',
-            '& fieldset': { borderColor: '#1e293b' },
-            '&:hover fieldset': { borderColor: '#334155' },
-            '&.Mui-focused fieldset': {
-              borderColor: '#06b6d4',
-              boxShadow: '0 0 0 2px rgba(6, 182, 212, 0.18)',
-            },
-          },
-        },
-      },
-    },
-    MuiSelect: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#0b0f17',
-        },
-      },
-    },
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          borderColor: 'rgba(255,255,255,0.06)',
-          padding: '6px 10px',
-          fontSize: '0.75rem',
-        },
-      },
-    },
-    MuiTab: {
-      styleOverrides: {
-        root: {
-          minHeight: 36,
-          textTransform: 'none',
-          fontWeight: 700,
-          fontFamily: 'Space Grotesk, sans-serif',
-          fontSize: '0.74rem',
-          letterSpacing: 0,
+          backgroundColor: '#111726',
         },
       },
     },
@@ -230,7 +160,7 @@ const PRESET_COLORS: ColorOption[] = [
 
 export default function DemonResponsiveAdminPage() {
   const { modelsList, addModel, updateModel, deleteModel, resetCatalog } = useWizard();
-  const isMobile = useMediaQuery('(max-width:640px)');
+  const isMobile = useMediaQuery('(max-width:768px)');
 
   // Revealing system state for mobile & desktop cards
   const [expandedCardIds, setExpandedCardIds] = useState<Record<string, boolean>>({});
@@ -262,8 +192,9 @@ export default function DemonResponsiveAdminPage() {
   const [selectedBrandFilter, setSelectedBrandFilter] = useState<string>('all');
   const [selectedSeriesFilter, setSelectedSeriesFilter] = useState<string>('all');
 
-  // View Mode: grid vs table on desktop/mobile
+  // View Mode: on mobile, ALWAYS 'grid' to avoid horizontal table blowout
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const effectiveViewMode = isMobile ? 'grid' : viewMode;
 
   // Add / Edit Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -293,12 +224,12 @@ export default function DemonResponsiveAdminPage() {
     storageOptions: StorageOption[];
   }>({
     id: '',
-    brandId: 'samsung',
-    seriesId: 'samsung-a',
+    brandId: 'apple',
+    seriesId: 'apple-18',
     name: '',
     basePrice: 50000,
-    image: '/samsung.svg',
-    specs: '8GB RAM, 256GB Storage, Official Warranty',
+    image: '/apple.png',
+    specs: 'Apple A20 Pro, 48MP Camera, Official Warranty',
     colors: [...PRESET_COLORS.slice(0, 3)],
     storageOptions: [{ size: 'Standard Storage', priceDelta: 0 }]
   });
@@ -324,27 +255,16 @@ export default function DemonResponsiveAdminPage() {
     });
   }, [modelsList, searchTerm, selectedBrandFilter, selectedSeriesFilter]);
 
-  // Key KPI stats for dense summary pills
-  const minPrice = useMemo(() => {
-    if (modelsList.length === 0) return 0;
-    return Math.min(...modelsList.map((m) => m.basePrice));
-  }, [modelsList]);
-
-  const minEmi = useMemo(() => {
-    if (modelsList.length === 0) return 0;
-    return Math.round(minPrice / 36);
-  }, [minPrice, modelsList]);
-
   const handleOpenAddModal = () => {
     setEditingModel(null);
     setFormData({
       id: `dev-${Date.now()}`,
-      brandId: 'samsung',
-      seriesId: 'samsung-a',
+      brandId: 'apple',
+      seriesId: 'apple-18',
       name: '',
       basePrice: 50000,
-      image: '/samsung.svg',
-      specs: '8GB RAM, 256GB Storage, Official Warranty',
+      image: '/apple.png',
+      specs: 'Apple A20 Pro, 48MP Camera, Official Warranty',
       colors: [...PRESET_COLORS.slice(0, 3)],
       storageOptions: [{ size: 'Standard Storage', priceDelta: 0 }]
     });
@@ -456,7 +376,7 @@ export default function DemonResponsiveAdminPage() {
     }
   };
 
-  // Render Sidebar Content
+  // Render Sidebar Content for Drawer & Desktop
   const renderSidebarContent = () => (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', width: 250, backgroundColor: '#0f172a' }}>
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
@@ -560,10 +480,23 @@ export default function DemonResponsiveAdminPage() {
   );
 
   return (
-    <ThemeProvider theme={demonDarkTheme}>
+    <ThemeProvider theme={adminTheme}>
       <CssBaseline />
       
-      <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0b0f17', color: '#f8fafc', overflowX: 'hidden' }}>
+      {/* Root Layout Container - Strict 100vw constraint to prevent ANY horizontal overflow */}
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: '100vw',
+          minHeight: '100vh',
+          backgroundColor: '#0a0d14',
+          color: '#f8fafc',
+          overflowX: 'hidden',
+          display: 'flex',
+          boxSizing: 'border-box',
+          position: 'relative',
+        }}
+      >
         
         {/* Permanent Sidebar for Desktop (1024px+) */}
         <Box
@@ -584,7 +517,7 @@ export default function DemonResponsiveAdminPage() {
           {renderSidebarContent()}
         </Box>
 
-        {/* Mobile Material UI Slide-in Drawer (<1024px) */}
+        {/* Mobile Slide-in Drawer (<1024px) */}
         <Drawer
           anchor="left"
           open={isSidebarOpen}
@@ -603,76 +536,84 @@ export default function DemonResponsiveAdminPage() {
           {renderSidebarContent()}
         </Drawer>
 
-        {/* Main Content Area Wrapper */}
+        {/* Main Content Area */}
         <Box
           sx={{
             flexGrow: 1,
             ml: { xs: 0, lg: '250px' },
+            width: { xs: '100%', lg: 'calc(100% - 250px)' },
+            maxWidth: { xs: '100vw', lg: 'calc(100vw - 250px)' },
+            minWidth: 0,
             display: 'flex',
             flexDirection: 'column',
-            minWidth: 0,
-            width: { xs: '100%', lg: 'calc(100% - 250px)' },
+            overflowX: 'hidden',
+            boxSizing: 'border-box',
           }}
         >
           
-          {/* Material UI Sticky App Bar with Mobile Tabs */}
+          {/* Sticky Top App Bar */}
           <AppBar
             position="sticky"
             elevation={0}
             sx={{
-              backgroundColor: 'rgba(11, 15, 23, 0.94)',
+              backgroundColor: 'rgba(11, 15, 23, 0.96)',
               backdropFilter: 'blur(16px)',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
               zIndex: 90,
+              width: '100%',
+              maxWidth: '100vw',
+              boxSizing: 'border-box',
             }}
           >
             <Toolbar
               variant="dense"
               sx={{
-                minHeight: { xs: 44, sm: 50 },
-                px: { xs: 1.2, sm: 2 },
+                minHeight: { xs: 46, sm: 52 },
+                px: { xs: 1.5, sm: 2.5 },
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                width: '100%',
+                boxSizing: 'border-box',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <IconButton
                   onClick={() => setIsSidebarOpen(true)}
-                  sx={{ display: { lg: 'none' }, color: '#ffffff', p: 0.4 }}
+                  sx={{ display: { lg: 'none' }, color: '#ffffff', p: 0.5 }}
                   aria-label="Open Navigation Drawer"
                   size="small"
                 >
-                  <Menu size={18} />
+                  <Menu size={20} />
                 </IconButton>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: { xs: '0.88rem', sm: '1.05rem' } }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#ffffff', fontSize: { xs: '0.9rem', sm: '1.05rem' } }}>
                   Admin Panel
                 </Typography>
                 <Chip
                   label="IML"
                   size="small"
                   sx={{
-                    height: 16,
-                    fontSize: '0.58rem',
+                    height: 18,
+                    fontSize: '0.62rem',
                     fontWeight: 800,
-                    backgroundColor: 'rgba(6, 182, 212, 0.15)',
+                    backgroundColor: 'rgba(6, 182, 212, 0.2)',
                     color: '#06b6d4',
+                    borderRadius: 1,
                   }}
                 />
               </Box>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
-                {/* Shorter Add Button */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
                 <Button
                   variant="contained"
                   color="primary"
                   size="small"
                   onClick={handleOpenAddModal}
-                  startIcon={<Plus size={13} />}
+                  startIcon={<Plus size={14} />}
                   sx={{
-                    px: { xs: 1, sm: 1.4 },
-                    py: 0.3,
-                    fontSize: '0.68rem',
+                    px: { xs: 1.2, sm: 1.6 },
+                    py: 0.4,
+                    fontSize: '0.72rem',
                     fontWeight: 800,
                     borderRadius: 1.5,
                   }}
@@ -680,20 +621,19 @@ export default function DemonResponsiveAdminPage() {
                   + Add
                 </Button>
 
-                {/* Shorter Reset Button */}
                 <Tooltip title="Reset catalog to factory defaults">
                   <Button
                     variant="outlined"
                     color="inherit"
                     size="small"
                     onClick={handleReset}
-                    startIcon={<RotateCcw size={12} />}
+                    startIcon={<RotateCcw size={13} />}
                     sx={{
                       borderColor: 'rgba(255,255,255,0.15)',
                       color: '#94a3b8',
-                      px: { xs: 0.7, sm: 1 },
-                      py: 0.3,
-                      fontSize: '0.68rem',
+                      px: { xs: 0.8, sm: 1.2 },
+                      py: 0.4,
+                      fontSize: '0.72rem',
                       minWidth: 'auto',
                       borderRadius: 1.5,
                     }}
@@ -704,134 +644,93 @@ export default function DemonResponsiveAdminPage() {
               </Box>
             </Toolbar>
 
-            {/* Mobile Tabs Bar (<1024px) for 1-touch tab navigation */}
-            <Box sx={{ display: { xs: 'block', lg: 'none' }, borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+            {/* Mobile Navigation Tabs Bar */}
+            <Box sx={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', width: '100%', overflowX: 'auto' }}>
               <Tabs
                 value={activeTab}
                 onChange={(_, val) => setActiveTab(val)}
                 variant="scrollable"
                 scrollButtons={false}
                 sx={{
-                  minHeight: 34,
-                  '& .MuiTabs-indicator': { backgroundColor: '#06b6d4', height: 2 },
+                  minHeight: 38,
+                  '& .MuiTabs-indicator': { backgroundColor: '#06b6d4', height: 2.5 },
                 }}
               >
                 <Tab
                   label={`Devices (${modelsList.length})`}
                   value="catalog"
-                  icon={<Smartphone size={13} />}
+                  icon={<Smartphone size={14} />}
                   iconPosition="start"
-                  sx={{ minHeight: 34, py: 0.3, px: 1.2, fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#06b6d4' } }}
+                  sx={{ minHeight: 38, py: 0.4, px: 1.5, fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#06b6d4' } }}
                 />
                 <Tab
                   label="Colors"
                   value="colors"
-                  icon={<Palette size={13} />}
+                  icon={<Palette size={14} />}
                   iconPosition="start"
-                  sx={{ minHeight: 34, py: 0.3, px: 1.2, fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#06b6d4' } }}
+                  sx={{ minHeight: 38, py: 0.4, px: 1.5, fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#06b6d4' } }}
                 />
                 <Tab
                   label="Variants"
                   value="variants"
-                  icon={<Layers size={13} />}
+                  icon={<Layers size={14} />}
                   iconPosition="start"
-                  sx={{ minHeight: 34, py: 0.3, px: 1.2, fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#06b6d4' } }}
+                  sx={{ minHeight: 38, py: 0.4, px: 1.5, fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#06b6d4' } }}
                 />
                 <Tab
                   label="Brands"
                   value="brands"
-                  icon={<Sliders size={13} />}
+                  icon={<Sliders size={14} />}
                   iconPosition="start"
-                  sx={{ minHeight: 34, py: 0.3, px: 1.2, fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#06b6d4' } }}
+                  sx={{ minHeight: 38, py: 0.4, px: 1.5, fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', '&.Mui-selected': { color: '#06b6d4' } }}
                 />
               </Tabs>
             </Box>
           </AppBar>
 
-          {/* Quick KPI Metric Strip (Stitch Obsidian Telemetry feature) */}
+          {/* Main Content Workspace Container */}
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.8,
-              overflowX: 'auto',
-              px: { xs: 1, sm: 2 },
-              py: 0.8,
-              backgroundColor: '#0e1420',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-              '&::-webkit-scrollbar': { height: 0 },
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, px: 1, py: 0.3, borderRadius: 1.5, backgroundColor: 'rgba(6, 182, 212, 0.1)', flexShrink: 0 }}>
-              <Smartphone size={12} color="#06b6d4" />
-              <Typography variant="caption" sx={{ color: '#06b6d4', fontWeight: 700, fontSize: '0.68rem' }}>
-                Total: <strong>{modelsList.length}</strong>
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, px: 1, py: 0.3, borderRadius: 1.5, backgroundColor: 'rgba(16, 185, 129, 0.1)', flexShrink: 0 }}>
-              <ShieldCheck size={12} color="#10b981" />
-              <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 700, fontSize: '0.68rem' }}>
-                PTA Active
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, px: 1, py: 0.3, borderRadius: 1.5, backgroundColor: 'rgba(59, 130, 246, 0.1)', flexShrink: 0 }}>
-              <TrendingUp size={12} color="#3b82f6" />
-              <Typography variant="caption" sx={{ color: '#93c5fd', fontWeight: 700, fontSize: '0.68rem' }}>
-                From Rs. {minEmi.toLocaleString('en-PK')}/mo
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, px: 1, py: 0.3, borderRadius: 1.5, backgroundColor: 'rgba(245, 158, 11, 0.1)', flexShrink: 0 }}>
-              <Sparkles size={12} color="#f59e0b" />
-              <Typography variant="caption" sx={{ color: '#fbbf24', fontWeight: 700, fontSize: '0.68rem' }}>
-                0% Markup Active
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* Inner Workspace Container (Smaller containers on phone) */}
-          <Box
-            sx={{
-              p: { xs: 0.9, sm: 1.5, md: 2 },
-              maxWidth: 1300,
+              p: { xs: 1.2, sm: 2, md: 2.5 },
               width: '100%',
+              maxWidth: 1200,
               mx: 'auto',
               boxSizing: 'border-box',
+              overflowX: 'hidden',
             }}
           >
             
-            {/* High-Density Compact Filter Card */}
+            {/* Filter & Search Bar */}
             <Card
               sx={{
-                background: 'linear-gradient(135deg, #111827 0%, #0d121c 100%)',
-                border: '1px solid rgba(6, 182, 212, 0.15)',
-                borderRadius: { xs: 2, sm: 2.5 },
-                p: { xs: 1, sm: 1.5 },
-                mb: { xs: 1, sm: 1.5 },
+                background: '#111726',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: 2.5,
+                p: { xs: 1.2, sm: 1.8 },
+                mb: 1.5,
+                width: '100%',
+                boxSizing: 'border-box',
               }}
             >
-              {/* Header Info & View Mode Toggle */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: { xs: '0.8rem', sm: '0.95rem' } }}>
-                  {activeTab === 'catalog' && `Device Catalog (${filteredModels.length})`}
-                  {activeTab === 'colors' && 'Color Swatches'}
-                  {activeTab === 'variants' && 'Storage Variants'}
-                  {activeTab === 'brands' && 'Brands & Series'}
+              {/* Header inside Filter */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: { xs: '0.85rem', sm: '1rem' } }}>
+                  {activeTab === 'catalog' && `Showing ${filteredModels.length} of ${modelsList.length} Devices`}
+                  {activeTab === 'colors' && 'Color Swatches Palette'}
+                  {activeTab === 'variants' && 'Storage & RAM Matrix'}
+                  {activeTab === 'brands' && 'Brands & Series Directory'}
                 </Typography>
 
                 {activeTab === 'catalog' && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
-                    {/* Shorter Reveal All Button */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
                     <Button
                       size="small"
                       variant="text"
                       onClick={handleToggleExpandAll}
                       sx={{
-                        fontSize: '0.68rem',
-                        py: 0.15,
-                        px: 0.7,
+                        fontSize: '0.7rem',
+                        py: 0.2,
+                        px: 0.8,
                         minWidth: 'auto',
                         color: '#06b6d4',
                         fontWeight: 700,
@@ -842,71 +741,73 @@ export default function DemonResponsiveAdminPage() {
                       {Object.values(expandedCardIds).some(Boolean) ? 'Hide All' : 'Specs All'}
                     </Button>
 
-                    {/* Grid / Table View Toggle */}
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        borderRadius: 1.5,
-                        p: 0.15,
-                      }}
-                    >
-                      <IconButton
-                        size="small"
-                        onClick={() => setViewMode('grid')}
+                    {/* Table/Grid view toggle ONLY on desktop (hidden on mobile to prevent table overflow) */}
+                    {!isMobile && (
+                      <Box
                         sx={{
-                          p: 0.35,
-                          borderRadius: 1.2,
-                          backgroundColor: viewMode === 'grid' ? '#06b6d4' : 'transparent',
-                          color: viewMode === 'grid' ? '#001f26' : '#94a3b8',
+                          display: 'flex',
+                          backgroundColor: 'rgba(0, 0, 0, 0.35)',
+                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: 1.5,
+                          p: 0.15,
                         }}
-                        title="Grid View"
                       >
-                        <LayoutGrid size={13} />
-                      </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => setViewMode('grid')}
+                          sx={{
+                            p: 0.35,
+                            borderRadius: 1.2,
+                            backgroundColor: effectiveViewMode === 'grid' ? '#06b6d4' : 'transparent',
+                            color: effectiveViewMode === 'grid' ? '#001f26' : '#94a3b8',
+                          }}
+                          title="Grid View"
+                        >
+                          <LayoutGrid size={14} />
+                        </IconButton>
 
-                      <IconButton
-                        size="small"
-                        onClick={() => setViewMode('table')}
-                        sx={{
-                          p: 0.35,
-                          borderRadius: 1.2,
-                          backgroundColor: viewMode === 'table' ? '#06b6d4' : 'transparent',
-                          color: viewMode === 'table' ? '#001f26' : '#94a3b8',
-                        }}
-                        title="Table View"
-                      >
-                        <List size={13} />
-                      </IconButton>
-                    </Box>
+                        <IconButton
+                          size="small"
+                          onClick={() => setViewMode('table')}
+                          sx={{
+                            p: 0.35,
+                            borderRadius: 1.2,
+                            backgroundColor: effectiveViewMode === 'table' ? '#06b6d4' : 'transparent',
+                            color: effectiveViewMode === 'table' ? '#001f26' : '#94a3b8',
+                          }}
+                          title="Table View"
+                        >
+                          <List size={14} />
+                        </IconButton>
+                      </Box>
+                    )}
                   </Box>
                 )}
               </Box>
 
-              {/* High-Density Filters Row */}
-              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 0.8 }}>
+              {/* Search & Dropdown Filters Row */}
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1 }}>
                 
-                {/* Search Field */}
-                <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: 160 } }}>
+                {/* Search Input */}
+                <Box sx={{ flex: 1, minWidth: 0 }}>
                   <TextField
                     fullWidth
                     size="small"
-                    placeholder="Search model, series..."
+                    placeholder="Search phone name, specs..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     InputProps={{
-                      startAdornment: <Search size={14} color="#94a3b8" style={{ marginRight: 6 }} />,
+                      startAdornment: <Search size={15} color="#94a3b8" style={{ marginRight: 8, flexShrink: 0 }} />,
                       endAdornment: searchTerm ? (
                         <IconButton size="small" onClick={() => setSearchTerm('')} sx={{ color: '#94a3b8', p: 0.2 }}>
-                          <X size={13} />
+                          <X size={14} />
                         </IconButton>
                       ) : null,
                       sx: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                        borderRadius: 1.5,
-                        fontSize: '0.78rem',
-                        height: 32,
+                        backgroundColor: '#0a0d14',
+                        borderRadius: 2,
+                        fontSize: '0.8rem',
+                        height: 36,
                         '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
                       },
                     }}
@@ -914,8 +815,8 @@ export default function DemonResponsiveAdminPage() {
                 </Box>
 
                 {/* Brand & Series Select Filters */}
-                <Box sx={{ display: 'flex', gap: 0.8, width: { xs: '100%', sm: 'auto' } }}>
-                  <FormControl size="small" sx={{ flex: 1, minWidth: { xs: 0, sm: 120 } }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, width: { xs: '100%', sm: 260 }, flexShrink: 0 }}>
+                  <FormControl size="small" fullWidth>
                     <Select
                       value={selectedBrandFilter}
                       onChange={(e) => {
@@ -923,10 +824,10 @@ export default function DemonResponsiveAdminPage() {
                         setSelectedSeriesFilter('all');
                       }}
                       sx={{
-                        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                        borderRadius: 1.5,
-                        fontSize: '0.75rem',
-                        height: 32,
+                        backgroundColor: '#0a0d14',
+                        borderRadius: 2,
+                        fontSize: '0.78rem',
+                        height: 36,
                         color: '#ffffff',
                         '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
                       }}
@@ -938,15 +839,15 @@ export default function DemonResponsiveAdminPage() {
                     </Select>
                   </FormControl>
 
-                  <FormControl size="small" sx={{ flex: 1, minWidth: { xs: 0, sm: 110 } }}>
+                  <FormControl size="small" fullWidth>
                     <Select
                       value={selectedSeriesFilter}
                       onChange={(e) => setSelectedSeriesFilter(e.target.value)}
                       sx={{
-                        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                        borderRadius: 1.5,
-                        fontSize: '0.75rem',
-                        height: 32,
+                        backgroundColor: '#0a0d14',
+                        borderRadius: 2,
+                        fontSize: '0.78rem',
+                        height: 36,
                         color: '#ffffff',
                         '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
                       }}
@@ -960,16 +861,17 @@ export default function DemonResponsiveAdminPage() {
                 </Box>
               </Box>
 
-              {/* Horizontal Scrollable Brand Pills (Dense) */}
+              {/* Horizontal Scrollable Brand Chips */}
               <Box
                 sx={{
                   display: 'flex',
-                  gap: 0.6,
+                  gap: 0.8,
                   overflowX: 'auto',
-                  mt: 0.8,
-                  pb: 0.2,
-                  '&::-webkit-scrollbar': { height: 2 },
-                  '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 2 },
+                  mt: 1.2,
+                  pb: 0.3,
+                  width: '100%',
+                  '&::-webkit-scrollbar': { height: 3 },
+                  '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 3 },
                 }}
               >
                 <Chip
@@ -979,7 +881,7 @@ export default function DemonResponsiveAdminPage() {
                   variant={selectedBrandFilter === 'all' ? 'filled' : 'outlined'}
                   size="small"
                   clickable
-                  sx={{ height: 20, borderRadius: 2, fontWeight: 700, fontSize: '0.65rem', px: 0.4 }}
+                  sx={{ height: 24, borderRadius: 2, fontWeight: 700, fontSize: '0.7rem', px: 0.6 }}
                 />
                 {BRANDS.map((b) => {
                   const count = modelsList.filter((m) => m.brandId === b.id).length;
@@ -993,7 +895,7 @@ export default function DemonResponsiveAdminPage() {
                       variant={isSelected ? 'filled' : 'outlined'}
                       size="small"
                       clickable
-                      sx={{ height: 20, borderRadius: 2, fontWeight: 600, fontSize: '0.65rem', px: 0.4, borderColor: isSelected ? undefined : 'rgba(255,255,255,0.1)' }}
+                      sx={{ height: 24, borderRadius: 2, fontWeight: 600, fontSize: '0.7rem', px: 0.6, borderColor: isSelected ? undefined : 'rgba(255,255,255,0.12)' }}
                     />
                   );
                 })}
@@ -1005,27 +907,27 @@ export default function DemonResponsiveAdminPage() {
               <>
                 {filteredModels.length > 0 ? (
                   <>
-                    {/* TABLE VIEW */}
-                    {viewMode === 'table' && (
+                    {/* TABLE VIEW (Strictly Desktop Only) */}
+                    {effectiveViewMode === 'table' && (
                       <TableContainer
                         component={Paper}
                         sx={{
-                          backgroundColor: '#131a26',
-                          border: '1px solid rgba(255, 255, 255, 0.06)',
-                          borderRadius: 2.5,
+                          backgroundColor: '#111726',
+                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: 3,
                           overflowX: 'auto',
                           mb: 2,
                         }}
                       >
-                        <Table size="small" aria-label="Device Catalog Table" sx={{ minWidth: 600 }}>
-                          <TableHead sx={{ backgroundColor: 'rgba(0, 0, 0, 0.35)' }}>
+                        <Table size="small" aria-label="Device Catalog Table">
+                          <TableHead sx={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}>
                             <TableRow>
-                              <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.72rem' }}>DEVICE</TableCell>
-                              <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.72rem' }}>BRAND / SERIES</TableCell>
-                              <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.72rem' }}>SWATCHES</TableCell>
-                              <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.72rem' }}>CASH PRICE</TableCell>
-                              <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.72rem' }}>24-MO EMI</TableCell>
-                              <TableCell align="right" sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.72rem' }}>ACTIONS</TableCell>
+                              <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.75rem' }}>DEVICE</TableCell>
+                              <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.75rem' }}>BRAND / SERIES</TableCell>
+                              <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.75rem' }}>SWATCHES</TableCell>
+                              <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.75rem' }}>CASH PRICE</TableCell>
+                              <TableCell sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.75rem' }}>24-MO EMI</TableCell>
+                              <TableCell align="right" sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.75rem' }}>ACTIONS</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
@@ -1037,18 +939,18 @@ export default function DemonResponsiveAdminPage() {
                               return (
                                 <TableRow key={model.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 }, borderColor: 'rgba(255,255,255,0.04)' }}>
                                   <TableCell>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
                                       <Box
                                         component="img"
                                         src={model.image}
                                         alt={model.name}
-                                        sx={{ width: 32, height: 32, objectFit: 'contain', backgroundColor: '#ffffff', borderRadius: 1.5, p: 0.3 }}
+                                        sx={{ width: 36, height: 36, objectFit: 'contain', backgroundColor: '#ffffff', borderRadius: 1.5, p: 0.4 }}
                                       />
                                       <Box>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.82rem' }}>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.85rem' }}>
                                           {model.name}
                                         </Typography>
-                                        <Typography variant="caption" sx={{ color: '#64748b', display: 'block', fontSize: '0.65rem' }}>
+                                        <Typography variant="caption" sx={{ color: '#64748b', display: 'block', fontSize: '0.7rem' }}>
                                           {model.specs.join(' • ')}
                                         </Typography>
                                       </Box>
@@ -1056,25 +958,25 @@ export default function DemonResponsiveAdminPage() {
                                   </TableCell>
 
                                   <TableCell>
-                                    <Typography variant="body2" sx={{ color: '#cbd5e1', fontWeight: 600, fontSize: '0.75rem' }}>
+                                    <Typography variant="body2" sx={{ color: '#cbd5e1', fontWeight: 600, fontSize: '0.8rem' }}>
                                       {brand?.name}
                                     </Typography>
-                                    <Typography variant="caption" sx={{ color: '#64748b', display: 'block', fontSize: '0.65rem' }}>
+                                    <Typography variant="caption" sx={{ color: '#64748b', display: 'block', fontSize: '0.7rem' }}>
                                       {series?.name}
                                     </Typography>
                                   </TableCell>
 
                                   <TableCell>
-                                    <Box sx={{ display: 'flex', gap: 0.4, alignItems: 'center' }}>
+                                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
                                       {model.colors && model.colors.map((c, i) => (
                                         <Tooltip title={c.name} key={i} arrow>
                                           <Box
                                             sx={{
-                                              width: 12,
-                                              height: 12,
+                                              width: 14,
+                                              height: 14,
                                               borderRadius: '50%',
                                               backgroundColor: c.hex,
-                                              border: '1px solid rgba(255,255,255,0.3)',
+                                              border: '1px solid rgba(255,255,255,0.4)',
                                             }}
                                           />
                                         </Tooltip>
@@ -1082,11 +984,11 @@ export default function DemonResponsiveAdminPage() {
                                     </Box>
                                   </TableCell>
 
-                                  <TableCell sx={{ color: '#f43f5e', fontWeight: 800, fontSize: '0.8rem' }}>
+                                  <TableCell sx={{ color: '#f43f5e', fontWeight: 800, fontSize: '0.85rem' }}>
                                     Rs. {model.basePrice.toLocaleString('en-PK')}
                                   </TableCell>
 
-                                  <TableCell sx={{ color: '#06b6d4', fontWeight: 700, fontSize: '0.76rem' }}>
+                                  <TableCell sx={{ color: '#06b6d4', fontWeight: 700, fontSize: '0.82rem' }}>
                                     Rs. {monthly.toLocaleString('en-PK')}/mo
                                   </TableCell>
 
@@ -1095,11 +997,11 @@ export default function DemonResponsiveAdminPage() {
                                       <Button
                                         size="small"
                                         onClick={() => handleOpenEditModal(model)}
-                                        startIcon={<Edit3 size={12} />}
+                                        startIcon={<Edit3 size={13} />}
                                         sx={{
-                                          fontSize: '0.68rem',
-                                          py: 0.25,
-                                          px: 0.8,
+                                          fontSize: '0.72rem',
+                                          py: 0.3,
+                                          px: 1,
                                           backgroundColor: 'rgba(6, 182, 212, 0.15)',
                                           color: '#06b6d4',
                                           '&:hover': { backgroundColor: 'rgba(6, 182, 212, 0.25)' },
@@ -1110,11 +1012,11 @@ export default function DemonResponsiveAdminPage() {
                                       <Button
                                         size="small"
                                         onClick={() => handleDelete(model.id, model.name)}
-                                        startIcon={<Trash2 size={12} />}
+                                        startIcon={<Trash2 size={13} />}
                                         sx={{
-                                          fontSize: '0.68rem',
-                                          py: 0.25,
-                                          px: 0.8,
+                                          fontSize: '0.72rem',
+                                          py: 0.3,
+                                          px: 1,
                                           backgroundColor: 'rgba(239, 68, 68, 0.15)',
                                           color: '#f87171',
                                           '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.25)' },
@@ -1132,8 +1034,8 @@ export default function DemonResponsiveAdminPage() {
                       </TableContainer>
                     )}
 
-                    {/* GRID VIEW: Redesigned Mobile-Optimized Compact Cards */}
-                    {viewMode === 'grid' && (
+                    {/* MOBILE-FIRST CARD LIST VIEW (1-Column on Phone, 2-Col on Tablet, 3-Col on Desktop) */}
+                    {effectiveViewMode === 'grid' && (
                       <Box
                         sx={{
                           display: 'grid',
@@ -1142,8 +1044,9 @@ export default function DemonResponsiveAdminPage() {
                             sm: 'repeat(2, 1fr)',
                             lg: 'repeat(3, 1fr)',
                           },
-                          gap: { xs: 0.9, sm: 1.2 },
+                          gap: 1.2,
                           width: '100%',
+                          boxSizing: 'border-box',
                         }}
                       >
                         {filteredModels.map((model) => {
@@ -1161,27 +1064,29 @@ export default function DemonResponsiveAdminPage() {
                             <Card
                               key={model.id}
                               sx={{
-                                backgroundColor: '#131a26',
-                                border: isExpanded ? '1px solid rgba(6, 182, 212, 0.4)' : '1px solid rgba(255, 255, 255, 0.06)',
-                                borderRadius: { xs: 2, sm: 2.5 },
-                                transition: 'all 0.2s ease',
+                                backgroundColor: '#111726',
+                                border: isExpanded ? '1px solid rgba(6, 182, 212, 0.5)' : '1px solid rgba(255, 255, 255, 0.08)',
+                                borderRadius: 2.5,
+                                transition: 'border-color 0.2s ease',
                                 overflow: 'hidden',
+                                width: '100%',
+                                boxSizing: 'border-box',
                               }}
                             >
-                              {/* Compact Primary Row (High Density on Mobile) */}
-                              <Box sx={{ p: { xs: 0.9, sm: 1.2 } }}>
+                              {/* Primary Card Content */}
+                              <Box sx={{ p: 1.4 }}>
                                 
                                 {/* Top Line: Thumbnail + Title + Brand/PTA */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.2 }}>
                                   
                                   {/* Device Thumbnail */}
                                   <Box
                                     sx={{
-                                      width: { xs: 34, sm: 38 },
-                                      height: { xs: 34, sm: 38 },
+                                      width: 44,
+                                      height: 44,
                                       backgroundColor: '#ffffff',
-                                      borderRadius: 1.5,
-                                      p: 0.3,
+                                      borderRadius: 2,
+                                      p: 0.4,
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'center',
@@ -1193,11 +1098,22 @@ export default function DemonResponsiveAdminPage() {
 
                                   {/* Model Info */}
                                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.4 }}>
-                                      <Typography variant="caption" sx={{ color: '#06b6d4', fontWeight: 700, fontSize: '0.62rem', textTransform: 'uppercase' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5, mb: 0.2 }}>
+                                      <Typography variant="caption" sx={{ color: '#06b6d4', fontWeight: 800, fontSize: '0.68rem', textTransform: 'uppercase' }}>
                                         {brand?.name} • {series?.name}
                                       </Typography>
-                                      <Chip label="PTA" size="small" sx={{ height: 14, fontSize: '0.52rem', fontWeight: 800, backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }} />
+                                      <Chip
+                                        label="PTA"
+                                        size="small"
+                                        sx={{
+                                          height: 16,
+                                          fontSize: '0.58rem',
+                                          fontWeight: 800,
+                                          backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                                          color: '#34d399',
+                                          borderRadius: 1,
+                                        }}
+                                      />
                                     </Box>
                                     
                                     <Typography
@@ -1205,67 +1121,72 @@ export default function DemonResponsiveAdminPage() {
                                       sx={{
                                         fontWeight: 800,
                                         color: '#ffffff',
-                                        fontSize: { xs: '0.82rem', sm: '0.88rem' },
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        lineHeight: 1.2,
-                                        my: 0.1,
+                                        fontSize: '0.9rem',
+                                        lineHeight: 1.25,
+                                        mb: 0.6,
                                       }}
                                     >
                                       {model.name}
                                     </Typography>
 
-                                    {/* Pricing & Installment Badge */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap' }}>
-                                      <Typography variant="caption" sx={{ color: '#f43f5e', fontWeight: 900, fontSize: '0.76rem' }}>
-                                        Rs. {model.basePrice.toLocaleString('en-PK')}
-                                      </Typography>
-                                      <Typography variant="caption" sx={{ color: '#06b6d4', fontWeight: 700, fontSize: '0.7rem' }}>
-                                        Rs. {monthly.toLocaleString('en-PK')}/mo
-                                      </Typography>
+                                    {/* Pricing & EMI */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                      <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.4 }}>
+                                        <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.65rem' }}>Cash:</Typography>
+                                        <Typography variant="caption" sx={{ color: '#f43f5e', fontWeight: 900, fontSize: '0.82rem' }}>
+                                          Rs. {model.basePrice.toLocaleString('en-PK')}
+                                        </Typography>
+                                      </Box>
+
+                                      <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.4 }}>
+                                        <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.65rem' }}>24-Mo:</Typography>
+                                        <Typography variant="caption" sx={{ color: '#06b6d4', fontWeight: 800, fontSize: '0.78rem' }}>
+                                          Rs. {monthly.toLocaleString('en-PK')}/mo
+                                        </Typography>
+                                      </Box>
                                     </Box>
                                   </Box>
                                 </Box>
 
-                                {/* Micro-Bar Actions (Very Compact and clean on phone) */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 0.8, pt: 0.6, borderTop: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                                {/* Action Buttons Row */}
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1.2, pt: 1, borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
                                   
-                                  {/* Color dots preview */}
-                                  <Box sx={{ display: 'flex', gap: 0.4, alignItems: 'center' }}>
-                                    {model.colors?.slice(0, 3).map((c, i) => (
+                                  {/* Color swatches preview dots */}
+                                  <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                                    {model.colors?.slice(0, 4).map((c, i) => (
                                       <Box
                                         key={i}
                                         sx={{
-                                          width: 10,
-                                          height: 10,
+                                          width: 12,
+                                          height: 12,
                                           borderRadius: '50%',
                                           backgroundColor: c.hex,
-                                          border: '1px solid rgba(255,255,255,0.3)',
+                                          border: '1.5px solid rgba(255,255,255,0.3)',
                                         }}
                                       />
                                     ))}
-                                    {(model.colors?.length || 0) > 3 && (
-                                      <Typography variant="caption" sx={{ fontSize: '0.6rem', color: '#64748b' }}>
-                                        +{(model.colors?.length || 0) - 3}
+                                    {(model.colors?.length || 0) > 4 && (
+                                      <Typography variant="caption" sx={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 700 }}>
+                                        +{(model.colors?.length || 0) - 4}
                                       </Typography>
                                     )}
                                   </Box>
 
                                   {/* Shorter Action Buttons */}
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
                                     <Button
                                       size="small"
                                       onClick={() => handleOpenEditModal(model)}
+                                      startIcon={<Edit3 size={13} />}
                                       sx={{
                                         minWidth: 'auto',
-                                        px: 0.8,
-                                        py: 0.2,
-                                        fontSize: '0.68rem',
+                                        px: 1,
+                                        py: 0.35,
+                                        fontSize: '0.72rem',
                                         color: '#06b6d4',
                                         fontWeight: 700,
                                         backgroundColor: 'rgba(6, 182, 212, 0.12)',
-                                        borderRadius: 1.2,
+                                        borderRadius: 1.5,
                                         '&:hover': { backgroundColor: 'rgba(6, 182, 212, 0.22)' }
                                       }}
                                     >
@@ -1275,15 +1196,16 @@ export default function DemonResponsiveAdminPage() {
                                     <Button
                                       size="small"
                                       onClick={() => handleDelete(model.id, model.name)}
+                                      startIcon={<Trash2 size={13} />}
                                       sx={{
                                         minWidth: 'auto',
-                                        px: 0.8,
-                                        py: 0.2,
-                                        fontSize: '0.68rem',
+                                        px: 1,
+                                        py: 0.35,
+                                        fontSize: '0.72rem',
                                         color: '#f87171',
                                         fontWeight: 700,
                                         backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                                        borderRadius: 1.2,
+                                        borderRadius: 1.5,
                                         '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.22)' }
                                       }}
                                     >
@@ -1295,14 +1217,14 @@ export default function DemonResponsiveAdminPage() {
                                       size="small"
                                       variant="outlined"
                                       onClick={() => toggleCardExpansion(model.id)}
-                                      endIcon={isExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                                      endIcon={isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
                                       sx={{
                                         minWidth: 'auto',
-                                        px: 0.8,
-                                        py: 0.2,
-                                        fontSize: '0.68rem',
-                                        borderRadius: 1.2,
-                                        borderColor: isExpanded ? '#06b6d4' : 'rgba(255, 255, 255, 0.12)',
+                                        px: 1,
+                                        py: 0.35,
+                                        fontSize: '0.72rem',
+                                        borderRadius: 1.5,
+                                        borderColor: isExpanded ? '#06b6d4' : 'rgba(255, 255, 255, 0.15)',
                                         color: isExpanded ? '#06b6d4' : '#cbd5e1',
                                         backgroundColor: isExpanded ? 'rgba(6, 182, 212, 0.08)' : 'transparent',
                                       }}
@@ -1315,32 +1237,32 @@ export default function DemonResponsiveAdminPage() {
 
                               {/* REVEALING SYSTEM: Collapsible Detailed Breakdown */}
                               <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
-                                <Box sx={{ p: { xs: 0.9, sm: 1.2 }, backgroundColor: 'rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.06)' }} />
+                                <Box sx={{ p: 1.4, backgroundColor: 'rgba(0, 0, 0, 0.35)', display: 'flex', flexDirection: 'column', gap: 1 }}>
                                   
                                   {/* Specs tags */}
                                   <Box>
-                                    <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.62rem', textTransform: 'uppercase', display: 'block', mb: 0.3 }}>
+                                    <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 800, fontSize: '0.65rem', textTransform: 'uppercase', display: 'block', mb: 0.4 }}>
                                       Specs &amp; Warranty:
                                     </Typography>
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3 }}>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.4 }}>
                                       {model.specs.map((sp, i) => (
-                                        <Chip key={i} label={sp} size="small" sx={{ height: 16, fontSize: '0.6rem', backgroundColor: 'rgba(255,255,255,0.06)', color: '#cbd5e1' }} />
+                                        <Chip key={i} label={sp} size="small" sx={{ height: 18, fontSize: '0.65rem', backgroundColor: 'rgba(255,255,255,0.06)', color: '#cbd5e1' }} />
                                       ))}
                                     </Box>
                                   </Box>
 
                                   {/* Color Swatches */}
-                                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 0.6 }}>
-                                    <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.62rem', textTransform: 'uppercase' }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 0.8 }}>
+                                    <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 800, fontSize: '0.65rem', textTransform: 'uppercase' }}>
                                       Colors:
                                     </Typography>
-                                    <Box sx={{ display: 'flex', gap: 0.6, alignItems: 'center' }}>
+                                    <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
                                       {model.colors && model.colors.map((c, i) => (
                                         <Tooltip key={i} title={c.name} arrow>
-                                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
-                                            <Box sx={{ width: 11, height: 11, borderRadius: '50%', backgroundColor: c.hex, border: '1px solid rgba(255,255,255,0.3)' }} />
-                                            <Typography variant="caption" sx={{ color: '#cbd5e1', fontSize: '0.62rem' }}>{c.name}</Typography>
+                                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
+                                            <Box sx={{ width: 13, height: 13, borderRadius: '50%', backgroundColor: c.hex, border: '1px solid rgba(255,255,255,0.3)' }} />
+                                            <Typography variant="caption" sx={{ color: '#cbd5e1', fontSize: '0.68rem' }}>{c.name}</Typography>
                                           </Box>
                                         </Tooltip>
                                       ))}
@@ -1350,16 +1272,16 @@ export default function DemonResponsiveAdminPage() {
                                   {/* Storage Variants */}
                                   {model.storageOptions && model.storageOptions.length > 0 && (
                                     <Box>
-                                      <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.62rem', textTransform: 'uppercase', display: 'block', mb: 0.3 }}>
-                                        Storage Variants:
+                                      <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 800, fontSize: '0.65rem', textTransform: 'uppercase', display: 'block', mb: 0.4 }}>
+                                        Storage Configurations:
                                       </Typography>
-                                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.4 }}>
+                                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         {model.storageOptions.map((st, i) => (
                                           <Chip
                                             key={i}
                                             label={`${st.size} ${st.priceDelta > 0 ? `(+Rs. ${st.priceDelta.toLocaleString('en-PK')})` : '(Base)'}`}
                                             size="small"
-                                            sx={{ height: 18, fontSize: '0.62rem', fontWeight: 600, backgroundColor: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4' }}
+                                            sx={{ height: 20, fontSize: '0.65rem', fontWeight: 600, backgroundColor: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4' }}
                                           />
                                         ))}
                                       </Box>
@@ -1367,22 +1289,22 @@ export default function DemonResponsiveAdminPage() {
                                   )}
 
                                   {/* Installment Plan Breakdown Grid (4 columns) */}
-                                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0.4, backgroundColor: 'rgba(0, 0, 0, 0.35)', p: 0.6, borderRadius: 1.5 }}>
+                                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0.6, backgroundColor: '#0a0d14', p: 0.8, borderRadius: 2, border: '1px solid rgba(255,255,255,0.05)' }}>
                                     <Box sx={{ textAlign: 'center' }}>
-                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.55rem', display: 'block', fontWeight: 700 }}>DOWN</Typography>
-                                      <Typography variant="caption" sx={{ color: '#f8fafc', fontSize: '0.65rem', fontWeight: 800 }}>Rs. {downP.toLocaleString('en-PK')}</Typography>
+                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.6rem', display: 'block', fontWeight: 800 }}>DOWN</Typography>
+                                      <Typography variant="caption" sx={{ color: '#f8fafc', fontSize: '0.7rem', fontWeight: 800 }}>Rs. {downP.toLocaleString('en-PK')}</Typography>
                                     </Box>
                                     <Box sx={{ textAlign: 'center' }}>
-                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.55rem', display: 'block', fontWeight: 700 }}>12-MO</Typography>
-                                      <Typography variant="caption" sx={{ color: '#06b6d4', fontSize: '0.65rem', fontWeight: 800 }}>Rs. {emi12.toLocaleString('en-PK')}</Typography>
+                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.6rem', display: 'block', fontWeight: 800 }}>12-MO</Typography>
+                                      <Typography variant="caption" sx={{ color: '#06b6d4', fontSize: '0.7rem', fontWeight: 800 }}>Rs. {emi12.toLocaleString('en-PK')}</Typography>
                                     </Box>
                                     <Box sx={{ textAlign: 'center' }}>
-                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.55rem', display: 'block', fontWeight: 700 }}>24-MO</Typography>
-                                      <Typography variant="caption" sx={{ color: '#06b6d4', fontSize: '0.65rem', fontWeight: 800 }}>Rs. {emi24.toLocaleString('en-PK')}</Typography>
+                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.6rem', display: 'block', fontWeight: 800 }}>24-MO</Typography>
+                                      <Typography variant="caption" sx={{ color: '#06b6d4', fontSize: '0.7rem', fontWeight: 800 }}>Rs. {emi24.toLocaleString('en-PK')}</Typography>
                                     </Box>
                                     <Box sx={{ textAlign: 'center' }}>
-                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.55rem', display: 'block', fontWeight: 700 }}>36-MO</Typography>
-                                      <Typography variant="caption" sx={{ color: '#06b6d4', fontSize: '0.65rem', fontWeight: 800 }}>Rs. {emi36.toLocaleString('en-PK')}</Typography>
+                                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.6rem', display: 'block', fontWeight: 800 }}>36-MO</Typography>
+                                      <Typography variant="caption" sx={{ color: '#06b6d4', fontSize: '0.7rem', fontWeight: 800 }}>Rs. {emi36.toLocaleString('en-PK')}</Typography>
                                     </Box>
                                   </Box>
 
@@ -1395,46 +1317,46 @@ export default function DemonResponsiveAdminPage() {
                     )}
                   </>
                 ) : (
-                  <Card sx={{ p: 4, textAlign: 'center', backgroundColor: '#131a26', borderRadius: 2.5 }}>
+                  <Card sx={{ p: 4, textAlign: 'center', backgroundColor: '#111726', borderRadius: 3 }}>
                     <Smartphone size={36} color="#64748b" style={{ marginBottom: 8 }} />
                     <Typography variant="body2" sx={{ color: '#cbd5e1', fontWeight: 700, mb: 1.5 }}>
                       No devices match current filter.
                     </Typography>
                     <Button variant="contained" color="primary" size="small" onClick={handleOpenAddModal} startIcon={<Plus size={14} />}>
-                      Add Device
+                      Add First Device
                     </Button>
                   </Card>
                 )}
               </>
             )}
 
-            {/* TAB 2: COLOR SWATCHES MANAGER */}
+            {/* TAB 2: COLOR SWATCHES */}
             {activeTab === 'colors' && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff' }}>
-                  Global Color Variations
+                  Global Color Variations Catalog
                 </Typography>
 
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 1 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 1.2 }}>
                   {PRESET_COLORS.map((preset, idx) => {
                     const matchedModels = modelsList.filter((m) => m.colors?.some((c) => c.hex.toLowerCase() === preset.hex.toLowerCase()));
                     return (
-                      <Card key={idx} sx={{ backgroundColor: '#131a26', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: 2, p: 1.2 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.6 }}>
-                          <Box sx={{ width: 18, height: 18, borderRadius: '50%', backgroundColor: preset.hex, border: '2px solid rgba(255,255,255,0.4)', flexShrink: 0 }} />
+                      <Card key={idx} sx={{ backgroundColor: '#111726', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: 2.5, p: 1.4 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 0.8 }}>
+                          <Box sx={{ width: 22, height: 22, borderRadius: '50%', backgroundColor: preset.hex, border: '2px solid rgba(255,255,255,0.4)', flexShrink: 0 }} />
                           <Box sx={{ minWidth: 0, flex: 1 }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.78rem', lineHeight: 1.2 }}>{preset.name}</Typography>
-                            <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.65rem' }}>{preset.hex}</Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.82rem', lineHeight: 1.2 }}>{preset.name}</Typography>
+                            <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.68rem' }}>{preset.hex}</Typography>
                           </Box>
-                          <Chip label={`${matchedModels.length}`} size="small" color="primary" sx={{ height: 16, fontSize: '0.62rem', fontWeight: 800 }} />
+                          <Chip label={`${matchedModels.length}`} size="small" color="primary" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 800 }} />
                         </Box>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3, mt: 0.4 }}>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.4, mt: 0.6 }}>
                           {matchedModels.length > 0 ? (
                             matchedModels.map((m) => (
-                              <Chip key={m.id} label={m.name} size="small" variant="outlined" sx={{ height: 16, fontSize: '0.58rem', color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.1)' }} />
+                              <Chip key={m.id} label={m.name} size="small" variant="outlined" sx={{ height: 18, fontSize: '0.62rem', color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.1)' }} />
                             ))
                           ) : (
-                            <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.62rem' }}>No models assigned</Typography>
+                            <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem' }}>No models assigned</Typography>
                           )}
                         </Box>
                       </Card>
@@ -1444,34 +1366,34 @@ export default function DemonResponsiveAdminPage() {
               </Box>
             )}
 
-            {/* TAB 3: STORAGE VARIANTS MANAGER */}
+            {/* TAB 3: STORAGE VARIANTS */}
             {activeTab === 'variants' && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff' }}>
-                  Storage Configurations
+                  Storage &amp; RAM Configurations Matrix
                 </Typography>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {modelsList.map((m) => (
-                    <Card key={m.id} sx={{ backgroundColor: '#131a26', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: 2, p: 1 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.4 }}>
+                    <Card key={m.id} sx={{ backgroundColor: '#111726', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: 2.5, p: 1.2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.6 }}>
                         <Box sx={{ minWidth: 0, flex: 1 }}>
-                          <Typography variant="subtitle2" sx={{ color: '#ffffff', fontWeight: 800, fontSize: '0.8rem' }}>{m.name}</Typography>
-                          <Typography variant="caption" sx={{ color: '#f43f5e', fontWeight: 800, fontSize: '0.7rem' }}>
+                          <Typography variant="subtitle2" sx={{ color: '#ffffff', fontWeight: 800, fontSize: '0.85rem' }}>{m.name}</Typography>
+                          <Typography variant="caption" sx={{ color: '#f43f5e', fontWeight: 800, fontSize: '0.75rem' }}>
                             Base: Rs. {m.basePrice.toLocaleString('en-PK')}
                           </Typography>
                         </Box>
-                        <Button size="small" onClick={() => handleOpenEditModal(m)} sx={{ color: '#06b6d4', py: 0.2, px: 0.8, minWidth: 'auto', fontSize: '0.68rem', fontWeight: 700, backgroundColor: 'rgba(6, 182, 212, 0.12)', borderRadius: 1.2 }}>
+                        <Button size="small" onClick={() => handleOpenEditModal(m)} sx={{ color: '#06b6d4', py: 0.25, px: 1, minWidth: 'auto', fontSize: '0.7rem', fontWeight: 700, backgroundColor: 'rgba(6, 182, 212, 0.12)', borderRadius: 1.5 }}>
                           Edit
                         </Button>
                       </Box>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.4, mt: 0.4 }}>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
                         {m.storageOptions?.map((st, i) => (
                           <Chip
                             key={i}
                             label={`${st.size} ${st.priceDelta > 0 ? `(+Rs. ${st.priceDelta.toLocaleString('en-PK')})` : '(Base)'}`}
                             size="small"
-                            sx={{ height: 18, backgroundColor: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', fontSize: '0.62rem', fontWeight: 600 }}
+                            sx={{ height: 20, backgroundColor: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4', fontSize: '0.68rem', fontWeight: 600 }}
                           />
                         ))}
                       </Box>
@@ -1481,39 +1403,39 @@ export default function DemonResponsiveAdminPage() {
               </Box>
             )}
 
-            {/* TAB 4: BRANDS & SERIES DIRECTORY */}
+            {/* TAB 4: BRANDS & SERIES */}
             {activeTab === 'brands' && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff' }}>
-                  Official Brands &amp; Series
+                  Official Brand &amp; Series Directory
                 </Typography>
 
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 1 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 1.2 }}>
                   {BRANDS.map((b) => {
                     const brandModels = modelsList.filter((m) => m.brandId === b.id);
                     const brandSeries = SERIES.filter((s) => s.brandId === b.id);
 
                     return (
-                      <Card key={b.id} sx={{ backgroundColor: '#131a26', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: 2, p: 1.2 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.8 }}>
-                          <Box component="img" src={b.logoUrl} alt={b.name} sx={{ width: 28, height: 28, objectFit: 'contain', backgroundColor: '#ffffff', borderRadius: 1.2, p: 0.3 }} />
+                      <Card key={b.id} sx={{ backgroundColor: '#111726', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: 2.5, p: 1.4 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 0.8 }}>
+                          <Box component="img" src={b.logoUrl} alt={b.name} sx={{ width: 32, height: 32, objectFit: 'contain', backgroundColor: '#ffffff', borderRadius: 1.5, p: 0.4 }} />
                           <Box sx={{ minWidth: 0, flex: 1 }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.8rem' }}>{b.name}</Typography>
-                            <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.65rem' }}>{brandModels.length} Devices</Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.85rem' }}>{b.name}</Typography>
+                            <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.68rem' }}>{brandModels.length} Devices</Typography>
                           </Box>
                           <Button
                             size="small"
                             onClick={() => { setSelectedBrandFilter(b.id); setActiveTab('catalog'); }}
-                            sx={{ minWidth: 'auto', px: 0.8, py: 0.25, fontSize: '0.68rem', fontWeight: 700, backgroundColor: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', borderRadius: 1.2 }}
+                            sx={{ minWidth: 'auto', px: 1, py: 0.3, fontSize: '0.7rem', fontWeight: 700, backgroundColor: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', borderRadius: 1.5 }}
                           >
                             View
                           </Button>
                         </Box>
 
-                        <Typography variant="caption" sx={{ color: '#06b6d4', fontWeight: 700, fontSize: '0.62rem', display: 'block', mb: 0.3 }}>Series:</Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3 }}>
+                        <Typography variant="caption" sx={{ color: '#06b6d4', fontWeight: 700, fontSize: '0.65rem', display: 'block', mb: 0.4 }}>Series:</Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.4 }}>
                           {brandSeries.map((s) => (
-                            <Chip key={s.id} label={s.name} size="small" variant="outlined" sx={{ height: 16, fontSize: '0.6rem', color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.1)' }} />
+                            <Chip key={s.id} label={s.name} size="small" variant="outlined" sx={{ height: 18, fontSize: '0.65rem', color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.12)' }} />
                           ))}
                         </Box>
                       </Card>
@@ -1526,7 +1448,7 @@ export default function DemonResponsiveAdminPage() {
           </Box>
         </Box>
 
-        {/* Mobile Floating Action Button (FAB) - Compact 40px */}
+        {/* Mobile Floating Action Button (FAB) */}
         <Fab
           color="primary"
           aria-label="Add Device"
@@ -1534,19 +1456,19 @@ export default function DemonResponsiveAdminPage() {
           size="small"
           sx={{
             position: 'fixed',
-            bottom: { xs: 16, sm: 20 },
-            right: { xs: 16, sm: 20 },
+            bottom: 20,
+            right: 20,
             display: { xs: 'flex', lg: 'none' },
             boxShadow: '0 4px 18px rgba(6, 182, 212, 0.45)',
             zIndex: 120,
-            width: 42,
-            height: 42,
+            width: 44,
+            height: 44,
           }}
         >
-          <Plus size={20} color="#001f26" />
+          <Plus size={22} color="#001f26" />
         </Fab>
 
-        {/* Material UI Responsive Add/Edit Dialog Modal (Bottom Sheet on Mobile) */}
+        {/* Material UI Responsive Add/Edit Dialog Modal */}
         <Dialog
           open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -1566,13 +1488,13 @@ export default function DemonResponsiveAdminPage() {
             },
           }}
         >
-          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1, pt: 1.5, px: 2 }}>
+          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1, pt: 1.8, px: 2.2 }}>
             <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#ffffff', fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#ffffff', fontSize: { xs: '0.98rem', sm: '1.15rem' } }}>
                 {editingModel ? `Edit: ${editingModel.name}` : 'Add New Device'}
               </Typography>
-              <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.7rem' }}>
-                Catalog details, specs, color options &amp; pricing.
+              <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.72rem' }}>
+                Specs, color variations, storage deltas &amp; prices.
               </Typography>
             </Box>
             <IconButton size="small" onClick={() => setIsModalOpen(false)} sx={{ color: '#94a3b8' }}>
@@ -1581,12 +1503,12 @@ export default function DemonResponsiveAdminPage() {
           </DialogTitle>
 
           <Box component="form" onSubmit={handleSaveModel} sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-            <DialogContent dividers sx={{ borderColor: 'rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 1.5, py: 1.5, px: 2, overflowY: 'auto', flex: 1 }}>
+            <DialogContent dividers sx={{ borderColor: 'rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 1.8, py: 1.8, px: 2.2, overflowY: 'auto', flex: 1 }}>
               
-              {/* Brand & Series Responsive Selects */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1 }}>
+              {/* Brand & Series Selects */}
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.2 }}>
                 <FormControl size="small" fullWidth>
-                  <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.3 }}>Brand *</Typography>
+                  <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.4 }}>Brand *</Typography>
                   <Select
                     value={formData.brandId}
                     onChange={(e) => {
@@ -1597,10 +1519,10 @@ export default function DemonResponsiveAdminPage() {
                         ...formData,
                         brandId: bId,
                         seriesId: availSeries[0]?.id || '',
-                        image: brandObj?.logoUrl || '/samsung.svg'
+                        image: brandObj?.logoUrl || '/apple.png'
                       });
                     }}
-                    sx={{ backgroundColor: '#0b0f17', borderRadius: 1.5, color: '#ffffff', height: 34, fontSize: '0.8rem' }}
+                    sx={{ backgroundColor: '#0a0d14', borderRadius: 2, color: '#ffffff', height: 36, fontSize: '0.82rem' }}
                   >
                     {BRANDS.map((b) => (
                       <MenuItem key={b.id} value={b.id}>{b.name}</MenuItem>
@@ -1609,11 +1531,11 @@ export default function DemonResponsiveAdminPage() {
                 </FormControl>
 
                 <FormControl size="small" fullWidth>
-                  <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.3 }}>Series *</Typography>
+                  <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.4 }}>Series *</Typography>
                   <Select
                     value={formData.seriesId}
                     onChange={(e) => setFormData({ ...formData, seriesId: e.target.value })}
-                    sx={{ backgroundColor: '#0b0f17', borderRadius: 1.5, color: '#ffffff', height: 34, fontSize: '0.8rem' }}
+                    sx={{ backgroundColor: '#0a0d14', borderRadius: 2, color: '#ffffff', height: 36, fontSize: '0.82rem' }}
                   >
                     {SERIES.filter((s) => s.brandId === formData.brandId).map((s) => (
                       <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>
@@ -1624,48 +1546,48 @@ export default function DemonResponsiveAdminPage() {
 
               {/* Model Name */}
               <Box>
-                <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.3, display: 'block' }}>Device Model Name *</Typography>
+                <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.4, display: 'block' }}>Device Model Name *</Typography>
                 <TextField
                   fullWidth
                   size="small"
                   required
-                  placeholder="e.g. S-25 Ultra 12/512 or iPhone 17 Pro"
+                  placeholder="e.g. iPhone 18 Pro Max PTA Approved"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   InputProps={{
-                    sx: { backgroundColor: '#0b0f17', borderRadius: 1.5, color: '#ffffff', fontSize: '0.8rem', height: 34 }
+                    sx: { backgroundColor: '#0a0d14', borderRadius: 2, color: '#ffffff', fontSize: '0.85rem', height: 36 }
                   }}
                 />
               </Box>
 
               {/* Price & Image Source */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.2 }}>
                 <Box>
-                  <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.3, display: 'block' }}>Base Price (PKR) *</Typography>
+                  <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.4, display: 'block' }}>Base Price (PKR) *</Typography>
                   <TextField
                     fullWidth
                     size="small"
                     type="number"
                     required
-                    placeholder="128000"
+                    placeholder="250000"
                     value={formData.basePrice}
                     onChange={(e) => setFormData({ ...formData, basePrice: Number(e.target.value) })}
                     InputProps={{
-                      sx: { backgroundColor: '#0b0f17', borderRadius: 1.5, color: '#ffffff', fontSize: '0.8rem', height: 34 }
+                      sx: { backgroundColor: '#0a0d14', borderRadius: 2, color: '#ffffff', fontSize: '0.85rem', height: 36 }
                     }}
                   />
                 </Box>
 
                 <Box>
-                  <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.3, display: 'block' }}>Image / Logo Path</Typography>
+                  <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.4, display: 'block' }}>Image / Logo Path</Typography>
                   <TextField
                     fullWidth
                     size="small"
-                    placeholder="/samsung.svg or /apple.png"
+                    placeholder="/apple.png or /samsung.svg"
                     value={formData.image}
                     onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                     InputProps={{
-                      sx: { backgroundColor: '#0b0f17', borderRadius: 1.5, color: '#ffffff', fontSize: '0.8rem', height: 34 }
+                      sx: { backgroundColor: '#0a0d14', borderRadius: 2, color: '#ffffff', fontSize: '0.85rem', height: 36 }
                     }}
                   />
                 </Box>
@@ -1673,35 +1595,35 @@ export default function DemonResponsiveAdminPage() {
 
               {/* Specs */}
               <Box>
-                <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.3, display: 'block' }}>Specs Tags (Comma-separated)</Typography>
+                <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, mb: 0.4, display: 'block' }}>Specs Tags (Comma-separated)</Typography>
                 <TextField
                   fullWidth
                   size="small"
-                  placeholder="8GB RAM, 256GB Storage, Official Warranty"
+                  placeholder="Apple A20 Pro, 48MP Camera, Official Warranty"
                   value={formData.specs}
                   onChange={(e) => setFormData({ ...formData, specs: e.target.value })}
                   InputProps={{
-                    sx: { backgroundColor: '#0b0f17', borderRadius: 1.5, color: '#ffffff', fontSize: '0.8rem', height: 34 }
+                    sx: { backgroundColor: '#0a0d14', borderRadius: 2, color: '#ffffff', fontSize: '0.85rem', height: 36 }
                   }}
                 />
               </Box>
 
               {/* COLOR VARIATIONS MANAGER */}
-              <Box sx={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 2, p: 1.2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 0.8 }}>
-                  <Palette size={15} color="#06b6d4" />
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.8rem' }}>Color Variations</Typography>
+              <Box sx={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 2, p: 1.4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 1 }}>
+                  <Palette size={16} color="#06b6d4" />
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.82rem' }}>Color Variations</Typography>
                 </Box>
 
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, mb: 1 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, mb: 1.2 }}>
                   {formData.colors.map((c, idx) => (
                     <Chip
                       key={idx}
-                      avatar={<Box sx={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: c.hex, ml: '3px !important' }} />}
+                      avatar={<Box sx={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: c.hex, ml: '4px !important' }} />}
                       label={c.name}
                       onDelete={() => handleRemoveColorFromForm(idx)}
                       size="small"
-                      sx={{ backgroundColor: 'rgba(255,255,255,0.06)', color: '#ffffff', fontSize: '0.68rem', height: 22 }}
+                      sx={{ backgroundColor: 'rgba(255,255,255,0.08)', color: '#ffffff', fontSize: '0.72rem', height: 24 }}
                     />
                   ))}
                 </Box>
@@ -1712,17 +1634,17 @@ export default function DemonResponsiveAdminPage() {
                     placeholder="Color Name"
                     value={newColorName}
                     onChange={(e) => setNewColorName(e.target.value)}
-                    sx={{ flex: { xs: '1 1 120px', sm: 1 }, '& input': { p: 0.6, fontSize: '0.75rem', height: 20 } }}
-                    InputProps={{ sx: { backgroundColor: '#0b0f17', borderRadius: 1.5, color: '#ffffff' } }}
+                    sx={{ flex: { xs: '1 1 130px', sm: 1 }, '& input': { p: 0.7, fontSize: '0.8rem', height: 22 } }}
+                    InputProps={{ sx: { backgroundColor: '#0a0d14', borderRadius: 1.5, color: '#ffffff' } }}
                   />
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
                     <input
                       type="color"
                       value={newColorHex}
                       onChange={(e) => setNewColorHex(e.target.value)}
-                      style={{ width: 30, height: 30, border: 'none', background: 'transparent', cursor: 'pointer', borderRadius: 4 }}
+                      style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', borderRadius: 4 }}
                     />
-                    <Button size="small" variant="outlined" onClick={handleAddColorToForm} sx={{ color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.15)', fontSize: '0.68rem' }}>
+                    <Button size="small" variant="outlined" onClick={handleAddColorToForm} sx={{ color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.2)', fontSize: '0.72rem' }}>
                       + Color
                     </Button>
                   </Box>
@@ -1730,20 +1652,20 @@ export default function DemonResponsiveAdminPage() {
               </Box>
 
               {/* STORAGE & RAM VARIANTS MANAGER */}
-              <Box sx={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 2, p: 1.2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 0.8 }}>
-                  <Layers size={15} color="#10b981" />
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.8rem' }}>Storage Variants &amp; Price Deltas</Typography>
+              <Box sx={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 2, p: 1.4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 1 }}>
+                  <Layers size={16} color="#10b981" />
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.82rem' }}>Storage Variants &amp; Price Deltas</Typography>
                 </Box>
 
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, mb: 1 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, mb: 1.2 }}>
                   {formData.storageOptions.map((st, idx) => (
                     <Chip
                       key={idx}
                       label={`${st.size} ${st.priceDelta > 0 ? `(+Rs. ${st.priceDelta.toLocaleString('en-PK')})` : '(Base)'}`}
                       onDelete={() => handleRemoveStorageFromForm(idx)}
                       size="small"
-                      sx={{ backgroundColor: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', fontSize: '0.68rem', fontWeight: 700, height: 22 }}
+                      sx={{ backgroundColor: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4', fontSize: '0.72rem', fontWeight: 700, height: 24 }}
                     />
                   ))}
                 </Box>
@@ -1754,8 +1676,8 @@ export default function DemonResponsiveAdminPage() {
                     placeholder="Variant (12/512GB)"
                     value={newStorageSize}
                     onChange={(e) => setNewStorageSize(e.target.value)}
-                    sx={{ flex: { xs: '1 1 110px', sm: 1 }, '& input': { p: 0.6, fontSize: '0.75rem', height: 20 } }}
-                    InputProps={{ sx: { backgroundColor: '#0b0f17', borderRadius: 1.5, color: '#ffffff' } }}
+                    sx={{ flex: { xs: '1 1 120px', sm: 1 }, '& input': { p: 0.7, fontSize: '0.8rem', height: 22 } }}
+                    InputProps={{ sx: { backgroundColor: '#0a0d14', borderRadius: 1.5, color: '#ffffff' } }}
                   />
                   <TextField
                     size="small"
@@ -1763,10 +1685,10 @@ export default function DemonResponsiveAdminPage() {
                     placeholder="+Delta"
                     value={newPriceDelta}
                     onChange={(e) => setNewPriceDelta(Number(e.target.value))}
-                    sx={{ width: { xs: 75, sm: 90 }, '& input': { p: 0.6, fontSize: '0.75rem', height: 20 } }}
-                    InputProps={{ sx: { backgroundColor: '#0b0f17', borderRadius: 1.5, color: '#ffffff' } }}
+                    sx={{ width: { xs: 80, sm: 95 }, '& input': { p: 0.7, fontSize: '0.8rem', height: 22 } }}
+                    InputProps={{ sx: { backgroundColor: '#0a0d14', borderRadius: 1.5, color: '#ffffff' } }}
                   />
-                  <Button size="small" variant="outlined" onClick={handleAddStorageToForm} sx={{ color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.15)', fontSize: '0.68rem' }}>
+                  <Button size="small" variant="outlined" onClick={handleAddStorageToForm} sx={{ color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.2)', fontSize: '0.72rem' }}>
                     + Variant
                   </Button>
                 </Box>
@@ -1774,11 +1696,11 @@ export default function DemonResponsiveAdminPage() {
 
             </DialogContent>
 
-            <DialogActions sx={{ p: 1.2, borderColor: 'rgba(255,255,255,0.06)', backgroundColor: '#0f172a' }}>
-              <Button onClick={() => setIsModalOpen(false)} size="small" sx={{ color: '#94a3b8', fontSize: '0.75rem' }}>
+            <DialogActions sx={{ p: 1.5, borderColor: 'rgba(255,255,255,0.06)', backgroundColor: '#0f172a' }}>
+              <Button onClick={() => setIsModalOpen(false)} size="small" sx={{ color: '#94a3b8', fontSize: '0.78rem' }}>
                 Cancel
               </Button>
-              <Button type="submit" variant="contained" color="primary" size="small" sx={{ px: 2, py: 0.5, fontWeight: 800, fontSize: '0.75rem' }}>
+              <Button type="submit" variant="contained" color="primary" size="small" sx={{ px: 2.4, py: 0.6, fontWeight: 800, fontSize: '0.78rem' }}>
                 {editingModel ? 'Save Changes' : 'Create Device'}
               </Button>
             </DialogActions>
@@ -1796,7 +1718,7 @@ export default function DemonResponsiveAdminPage() {
             onClose={() => setSnackbar({ ...snackbar, open: false })}
             severity={snackbar.severity}
             variant="filled"
-            sx={{ width: '100%', borderRadius: 2, fontWeight: 700, fontSize: '0.78rem' }}
+            sx={{ width: '100%', borderRadius: 2, fontWeight: 700, fontSize: '0.8rem' }}
           >
             {snackbar.message}
           </Alert>
