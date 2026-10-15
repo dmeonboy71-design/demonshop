@@ -114,11 +114,19 @@ export const FbrCertificateModal: React.FC<FbrCertificateModalProps> = ({ isOpen
 
         {/* Certificate Image Frame */}
         <div className="fbr-cert-image-frame">
-          <img 
-            src="/fbr-taxpayer-certificate.png" 
-            alt="FBR Taxpayer Profile Inquiry Certificate for Instalment Mobile Limited"
-            className="fbr-cert-img"
-          />
+          <a 
+            href="/fbr-taxpayer-certificate.png" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            title="Tap to view full resolution certificate"
+            style={{ display: 'flex', justifyContent: 'center', width: '100%', cursor: 'zoom-in' }}
+          >
+            <img 
+              src="/fbr-taxpayer-certificate.png" 
+              alt="FBR Taxpayer Profile Inquiry Certificate for Instalment Mobile Limited"
+              className="fbr-cert-img"
+            />
+          </a>
         </div>
 
         {/* Footer Actions */}

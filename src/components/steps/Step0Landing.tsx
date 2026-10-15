@@ -8,7 +8,6 @@ import {
   Headphones, 
   Award, 
   ChevronRight, 
-  ChevronLeft,
   Sparkles, 
   CheckCircle2, 
   Landmark,
@@ -121,16 +120,6 @@ export const Step0Landing: React.FC = () => {
                 <span>Dreams Now</span>
                 <span>Within Reach ♡</span>
               </div>
-
-              {/* Slider Navigation Controls (Matching reference) */}
-              <button 
-                type="button" 
-                className="hero-arrow-btn hero-arrow-left"
-                onClick={() => setHeroSlide((prev) => (prev === 0 ? 2 : prev - 1))}
-                aria-label="Previous Slide"
-              >
-                <ChevronLeft size={16} />
-              </button>
             </div>
           </div>
 
@@ -194,16 +183,6 @@ export const Step0Landing: React.FC = () => {
                 <span>Bigger Dreams</span>
                 <span>Smarter Choices</span>
               </div>
-
-              {/* Right Arrow Navigation */}
-              <button 
-                type="button" 
-                className="hero-arrow-btn hero-arrow-right"
-                onClick={() => setHeroSlide((prev) => (prev === 2 ? 0 : prev + 1))}
-                aria-label="Next Slide"
-              >
-                <ChevronRight size={16} />
-              </button>
             </div>
 
             {/* Pagination Indicator Dots */}
@@ -521,10 +500,12 @@ export const Step0Landing: React.FC = () => {
 
           {/* Secure Trust Strip with FBR Quick Verification Button */}
           <div className="featured-islamic-partner">
-            <div className="secure-badge-box" style={{ width: '100%', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <ShieldCheck size={15} color="#34d399" />
-                <span>100% Secure &amp; Verified Official Banking Channels • Shariah Compliant Options</span>
+            <div className="secure-badge-box">
+              <div className="secure-badge-content">
+                <ShieldCheck size={16} color="#34d399" style={{ flexShrink: 0 }} />
+                <span className="secure-badge-text">
+                  100% Secure &amp; Verified Official Banking Channels • Shariah Compliant Options
+                </span>
               </div>
 
               <button 
